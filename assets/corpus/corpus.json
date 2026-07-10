@@ -1,0 +1,184 @@
+{
+  "_schema": {
+    "version": "2.1",
+    "principle": "Pure pivot data: each concept carries its natural forms in every language, with no language privileged. The product only exposes the couples listed in config.active_pairs. Glosses (the word-for-word image) are stored per couple for active pairs; others will be generated on demand and cached.",
+    "language_rule": "Machine-facing and developer-facing strings are in English (schema docs, category/register codes, tags, editorial notes). User-facing content stays in its own language (forms, meaning, gloss literals and example translations, display names).",
+    "concept_fields": {
+      "id": "stable identifier, snake_case",
+      "category": "theme code in English (maps to a localized label via config.categories). Drives daily selection and premium theme filtering.",
+      "level": "approximate CEFR level of the TARGET expression (A1..C2). Indicative.",
+      "register": "neutral | informal | formal",
+      "meaning": "short definition of the concept, localized per language (shown to the user in their native language)",
+      "forms": "object keyed by language code. Each form = { text, example } in THAT language. Self-contained, neutral.",
+      "glosses": "object keyed by couple, key = '{target}_{native}'. Holds the word-for-word image of the target expression rendered in the native language, plus a translation of the example, plus an optional note.",
+      "tags": "free-form English keywords"
+    },
+    "gloss_fields": {
+      "literal": "the TARGET expression rendered word-for-word in the NATIVE language (conveys the imagery)",
+      "example_translation": "natural translation of the target example into the native language",
+      "note": "optional: flags a non-equivalence (no direct idiom). null when there is nothing to flag."
+    },
+    "availability_rule": "A concept is usable for a couple {native, target} if it has forms[native], forms[target] AND glosses['{target}_{native}']. The generation script guarantees this completeness.",
+    "daily_card_render": "For the couple (native=fr, target=en): show forms.en.text (the idiom to learn), glosses.en_fr.literal (its image in French), forms.fr.text (the natural French equivalent), forms.en.example (the English example) and glosses.en_fr.example_translation (its translation)."
+  },
+  "config": {
+    "languages": {
+      "en": { "name_native": "English",  "display": { "fr": "Anglais",  "es": "Inglés"  }, "flag": "🇬🇧" },
+      "fr": { "name_native": "Français", "display": { "en": "French",   "es": "Francés" }, "flag": "🇫🇷" },
+      "es": { "name_native": "Español",  "display": { "en": "Spanish",  "fr": "Espagnol"}, "flag": "🇪🇸" },
+      "de": { "name_native": "Deutsch",  "display": { "en": "German",   "fr": "Allemand", "es": "Alemán" }, "flag": "🇩🇪" }
+    },
+    "categories": {
+      "weather":    { "en": "Weather",    "fr": "Météo",      "es": "Clima" },
+      "money":      { "en": "Money",      "fr": "Argent",     "es": "Dinero" },
+      "time":       { "en": "Time",       "fr": "Temps",      "es": "Tiempo" },
+      "suspicion":  { "en": "Suspicion",  "fr": "Soupçon",    "es": "Sospecha" },
+      "emotions":   { "en": "Emotions",   "fr": "Émotions",   "es": "Emociones" },
+      "priorities": { "en": "Priorities", "fr": "Priorités",  "es": "Prioridades" },
+      "everyday":   { "en": "Everyday",   "fr": "Quotidien",  "es": "Cotidiano" }
+    },
+    "active_pairs": [
+      { "native": "fr", "target": "en" },
+      { "native": "es", "target": "en" }
+    ],
+    "_note_config": "The native-language picker makes selectable any language present as 'native' in active_pairs (here fr, es). Others (en, de) appear greyed out -> waitlist. Adding a couple = one line here, no code change."
+  },
+  "concepts": [
+    {
+      "id": "rain_heavy",
+      "category": "weather",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": { "fr": "Pleuvoir très fort.", "es": "Llover muchísimo.", "en": "To rain very heavily." },
+      "forms": {
+        "en": { "text": "It's raining cats and dogs.", "example": "We're staying in tonight, it's raining cats and dogs." },
+        "fr": { "text": "Il pleut des cordes.", "example": "On reste à la maison, il pleut des cordes." },
+        "es": { "text": "Llueve a cántaros.", "example": "Nos quedamos en casa, llueve a cántaros." }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Il pleut des chats et des chiens.", "example_translation": "On reste à la maison ce soir, il pleut des cordes.", "note": null },
+        "en_es": { "literal": "Llueve gatos y perros.", "example_translation": "Esta noche nos quedamos en casa, llueve a cántaros.", "note": null }
+      },
+      "tags": ["weather", "idiom", "animals"]
+    },
+    {
+      "id": "very_expensive",
+      "category": "money",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": { "fr": "Coûter très cher.", "es": "Costar muchísimo.", "en": "To be very expensive." },
+      "forms": {
+        "en": { "text": "To cost an arm and a leg.", "example": "That car cost me an arm and a leg." },
+        "fr": { "text": "Coûter les yeux de la tête.", "example": "Cette voiture coûte les yeux de la tête." },
+        "es": { "text": "Costar un ojo de la cara.", "example": "Ese coche cuesta un ojo de la cara." }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Coûter un bras et une jambe.", "example_translation": "Cette voiture m'a coûté les yeux de la tête.", "note": null },
+        "en_es": { "literal": "Costar un brazo y una pierna.", "example_translation": "Ese coche me costó un ojo de la cara.", "note": null }
+      },
+      "tags": ["money", "idiom", "body"]
+    },
+    {
+      "id": "never_happen",
+      "category": "time",
+      "level": "B1",
+      "register": "informal",
+      "meaning": { "fr": "Jamais ; à un moment qui n'arrivera pas.", "es": "Nunca.", "en": "Never; at a time that will never come." },
+      "forms": {
+        "en": { "text": "When pigs fly.", "example": "He'll clean his room when pigs fly." },
+        "fr": { "text": "Quand les poules auront des dents.", "example": "Il rangera sa chambre quand les poules auront des dents." },
+        "es": { "text": "Cuando las ranas críen pelo.", "example": "Ordenará su cuarto cuando las ranas críen pelo." }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Quand les cochons voleront.", "example_translation": "Il rangera sa chambre quand les poules auront des dents.", "note": null },
+        "en_es": { "literal": "Cuando los cerdos vuelen.", "example_translation": "Ordenará su cuarto cuando las ranas críen pelo.", "note": null }
+      },
+      "tags": ["time", "idiom", "animals"]
+    },
+    {
+      "id": "something_fishy",
+      "category": "suspicion",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": { "fr": "Quelque chose de louche, de caché.", "es": "Algo sospechoso.", "en": "Something seems suspicious." },
+      "forms": {
+        "en": { "text": "Something smells fishy.", "example": "He's being too nice, something smells fishy." },
+        "fr": { "text": "Il y a anguille sous roche.", "example": "Il sourit trop, il y a anguille sous roche." },
+        "es": { "text": "Hay gato encerrado.", "example": "Aquí hay gato encerrado." }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Quelque chose sent le poisson.", "example_translation": "Il est trop gentil, il y a anguille sous roche.", "note": null },
+        "en_es": { "literal": "Algo huele a pescado.", "example_translation": "Está demasiado amable, aquí hay gato encerrado.", "note": null }
+      },
+      "tags": ["suspicion", "idiom", "animals"]
+    },
+    {
+      "id": "feeling_down",
+      "category": "emotions",
+      "level": "B1",
+      "register": "informal",
+      "meaning": { "fr": "Être triste, déprimé.", "es": "Estar triste, decaído.", "en": "To feel sad or low." },
+      "forms": {
+        "en": { "text": "To have the blues.", "example": "I've had the blues since he left." },
+        "fr": { "text": "Avoir le cafard.", "example": "Depuis qu'il est parti, j'ai le cafard." },
+        "es": { "text": "Estar de bajón.", "example": "Estoy de bajón desde que se fue." }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Avoir 'le bleu' (le blues).", "example_translation": "J'ai le cafard depuis qu'il est parti.", "note": null },
+        "en_es": { "literal": "Tener 'los azules' (la melancolía).", "example_translation": "Estoy de bajón desde que se fue.", "note": "The English colour image has no colour-based equivalent in everyday Spanish; the natural equivalent is 'estar de bajon'." }
+      },
+      "tags": ["emotions", "idiom"]
+    },
+    {
+      "id": "other_fish_to_fry",
+      "category": "priorities",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": { "fr": "Avoir mieux à faire, des choses plus importantes.", "es": "Tener cosas más importantes que hacer.", "en": "To have more important things to do." },
+      "forms": {
+        "en": { "text": "To have other fish to fry.", "example": "I can't deal with this, I have other fish to fry." },
+        "fr": { "text": "Avoir d'autres chats à fouetter.", "example": "Je n'ai pas le temps, j'ai d'autres chats à fouetter." },
+        "es": { "text": "Tener cosas más importantes entre manos.", "example": "Tengo cosas más importantes entre manos." }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Avoir d'autres poissons à frire.", "example_translation": "Je ne peux pas gérer ça, j'ai d'autres chats à fouetter.", "note": "FR and EN each have an image-based idiom (cats / fish): good pedagogical and viral content." },
+        "en_es": { "literal": "Tener otros peces que freír.", "example_translation": "No puedo con esto, tengo cosas más importantes entre manos.", "note": "Everyday Spanish has no image-based equivalent idiom; render the meaning. Non-equivalence case to flag in the UI rather than inventing a fake idiom." }
+      },
+      "tags": ["priorities", "idiom", "animals", "non-equivalence"]
+    },
+    {
+      "id": "agreement_casual",
+      "category": "everyday",
+      "level": "A2",
+      "register": "informal",
+      "meaning": { "fr": "Marquer son accord de façon décontractée.", "es": "Mostrar acuerdo informalmente.", "en": "To express agreement casually." },
+      "forms": {
+        "en": { "text": "Works for me!", "example": "See you at 6? Works for me!" },
+        "fr": { "text": "Ça marche !", "example": "On se voit à 18h ? Ça marche !" },
+        "es": { "text": "¡Vale!", "example": "¿Nos vemos a las seis? ¡Vale!" }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Ça marche pour moi !", "example_translation": "On se voit à 18h ? Ça marche !", "note": null },
+        "en_es": { "literal": "¡Me funciona!", "example_translation": "¿Nos vemos a las seis? ¡Vale!", "note": null }
+      },
+      "tags": ["everyday", "interjection"]
+    },
+    {
+      "id": "frog_in_throat",
+      "category": "everyday",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": { "fr": "Être enroué, avoir du mal à parler.", "es": "Estar ronco.", "en": "To be hoarse." },
+      "forms": {
+        "en": { "text": "To have a frog in one's throat.", "example": "Sorry, I've got a frog in my throat." },
+        "fr": { "text": "Avoir un chat dans la gorge.", "example": "Excuse-moi, j'ai un chat dans la gorge." },
+        "es": { "text": "Tener carraspera.", "example": "Perdona, tengo carraspera." }
+      },
+      "glosses": {
+        "en_fr": { "literal": "Avoir une grenouille dans la gorge.", "example_translation": "Excuse-moi, j'ai un chat dans la gorge.", "note": "Same idea, different animal: frog (EN) vs cat (FR). Excellent viral content." },
+        "en_es": { "literal": "Tener una rana en la garganta.", "example_translation": "Perdona, tengo carraspera.", "note": "Spanish uses no animal; neutral equivalent 'tener carraspera'." }
+      },
+      "tags": ["everyday", "idiom", "animals", "non-equivalence"]
+    }
+  ]
+}
