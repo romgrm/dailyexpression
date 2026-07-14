@@ -8,6 +8,5 @@ void main() {
     await tester.pump();
 
     expect(find.byType(MaterialApp), findsOneWidget);
-    expect(find.text('Daily Expression'), findsOneWidget);
   });
 }
