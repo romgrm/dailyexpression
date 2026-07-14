@@ -16,7 +16,6 @@ class DailyExpressionApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Repositories are injected here in later milestones (MultiRepositoryProvider).
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),

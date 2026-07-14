@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/models/app_theme_mode.dart';
 
-/// Drives the app's theme mode. Seeded from persisted settings in a later
-/// milestone; defaults to following the OS.
+/// Drives the app's theme mode (system / light / dark).
 class ThemeCubit extends Cubit<AppThemeMode> {
   ThemeCubit([super.initialState = AppThemeMode.system]);
 
