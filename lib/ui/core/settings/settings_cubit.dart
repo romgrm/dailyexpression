@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:daily_expression/core/logging/app_log.dart';
 import 'package:daily_expression/data/repositories/settings_repository.dart';
 import 'package:daily_expression/domain/models/app_settings.dart';
 import 'package:daily_expression/domain/models/app_theme_mode.dart';
@@ -14,6 +15,11 @@ class SettingsCubit extends Cubit<AppSettings> {
   Future<void> _persist(AppSettings next) async {
     await _repository.save(next);
     emit(next);
+    logger.d(
+      '[settings] saved: onboarding=${next.onboardingComplete}, '
+      'native=${next.nativeLanguage}, theme=${next.themeMode.name}, '
+      'reminder=${next.reminderHour}:${next.reminderMinute}',
+    );
   }
 
   Future<void> completeOnboarding({

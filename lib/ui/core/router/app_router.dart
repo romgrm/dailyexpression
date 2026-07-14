@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/logging/app_log.dart';
 import '../../features/home/view/home_screen.dart';
 import '../../features/onboarding/cubit/onboarding_cubit.dart';
 import '../../features/onboarding/view/onboarding_intro_screen.dart';
@@ -21,9 +22,16 @@ GoRouter createRouter(SettingsCubit settingsCubit) {
     redirect: (context, state) {
       final onboarded = settingsCubit.state.onboardingComplete;
       final atOnboarding = state.matchedLocation.startsWith('/onboarding');
-      if (!onboarded && !atOnboarding) return '/onboarding';
-      if (onboarded && atOnboarding) return '/';
-      return null;
+      final target = !onboarded && !atOnboarding
+          ? '/onboarding'
+          : onboarded && atOnboarding
+              ? '/'
+              : null;
+      logger.d(
+        '[router] redirect: ${state.matchedLocation} '
+        '(onboarded=$onboarded) -> ${target ?? 'stay'}',
+      );
+      return target;
     },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),

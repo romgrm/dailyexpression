@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:daily_expression/core/logging/app_log.dart';
 import 'splash_screen.dart';
 
 /// The onboarding intro: shows the splash briefly, then advances to the first
@@ -22,7 +23,9 @@ final class _OnboardingIntroScreenState extends State<OnboardingIntroScreen> {
   void initState() {
     super.initState();
     _timer = Timer(_introDuration, () {
-      if (mounted) context.go('/onboarding/language');
+      if (!mounted) return;
+      logger.d('[onboarding] intro -> /onboarding/language');
+      context.go('/onboarding/language');
     });
   }
 

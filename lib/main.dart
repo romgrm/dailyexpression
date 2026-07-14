@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/logging/app_log.dart';
 import 'data/repositories/corpus_repository.dart';
 import 'data/repositories/settings_repository.dart';
 import 'data/services/corpus_asset_loader.dart';
@@ -16,12 +17,17 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final settingsRepository = SettingsRepository(prefs);
   final corpusRepository = CorpusRepository(CorpusAssetLoader());
+  final initialSettings = settingsRepository.read();
+  logger.d(
+    '[bootstrap] onboardingComplete=${initialSettings.onboardingComplete}, '
+    'native=${initialSettings.nativeLanguage}, theme=${initialSettings.themeMode.name}',
+  );
 
   runApp(
     DailyExpressionApp(
       settingsRepository: settingsRepository,
       corpusRepository: corpusRepository,
-      initialSettings: settingsRepository.read(),
+      initialSettings: initialSettings,
     ),
   );
 }

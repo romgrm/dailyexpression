@@ -1,3 +1,4 @@
+import '../../core/logging/app_log.dart';
 import '../../domain/models/corpus_config.dart';
 import '../../domain/models/language_info.dart';
 import '../../domain/models/language_pair.dart';
@@ -12,9 +13,15 @@ class CorpusRepository {
   CorpusConfig? _config;
 
   Future<CorpusConfig> loadConfig() async {
-    return _config ??= _parseConfig(
+    if (_config != null) return _config!;
+    final config = _parseConfig(
       (await _loader.loadRaw())['config'] as Map<String, dynamic>,
     );
+    logger.d(
+      '[corpus] config loaded: ${config.languages.length} languages, '
+      '${config.activePairs.length} active pairs',
+    );
+    return _config = config;
   }
 
   static CorpusConfig _parseConfig(Map<String, dynamic> config) {
