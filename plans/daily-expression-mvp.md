@@ -150,79 +150,91 @@ Shared test fakes live in `test/support/`.
 - **CHECK:** `flutter pub get`, `flutter gen-l10n`, `flutter analyze` clean; runs a blank themed screen (light + dark).
 - **Commit** `feat(setup): deps, light/dark theme, l10n scaffold, router shell`.
 
-## M1 · Domain Core (pure Dart, fully tested)
-- **1.1** Enums `cefr_level.dart`, `register.dart` (+label, +parse). Test: parse valid/invalid.
-- **1.2** VOs `language_pair.dart`, `expression_form.dart`, `gloss.dart`, `language_info.dart`. Test: glossKey, isNonEquivalent.
-- **1.3** `concept.dart` (+`isAvailableFor`). Test: fr→en & es→en; missing es gloss ⇒ unavailable for es→en.
-- **1.4** `daily_expression.dart` (`fromConcept(...)` render order). Test: rain_heavy fr→en; other_fish_to_fry es→en ⇒ nonEquivalent.
-- **1.5** `corpus_config.dart` (`selectableNativeCodes`). Test: {fr, es}.
-- **1.6** `app_settings.dart` (+`AppThemeMode`), `scheduled_reminder.dart` — copyWith/==, defaults (reminder 08:00, themeMode system).
-- **1.7** `domain/time/clock.dart` + `FakeClock` in `test/support/`. Test: today() strips time.
-- **1.8** `use_cases/select_daily_expression.dart` — `kAnchorDay = DateTime.utc(2026,1,1)`, `idx=((days%n)+n)%n`.
-  Tests: determinism, day advance, **midnight rollover**, **wrap-around past concept 8**, pre-anchor negatives.
-- **1.9** `use_cases/build_reminder_window.dart` — 14 entries, real idiom bodies, unique ids. Tests: count/order/body.
-- **1.10** Gate + commit `feat(domain): models, availability, daily selector, reminder window (+tests)`. **CHECK**.
+## Build approach — screen-first vertical slices
+M0 (foundation) is done. From here we build **screen by screen**. Each slice = the screen's UI (from
+`design/v1/*`) + only the domain/data it needs + its tests. Reusable pieces live in `lib/ui/core/widgets/`
+and are shared across screens (compose, never duplicate). Good patterns are non-negotiable even for the MVP:
+immutable models, layered separation (`ui -> domain <- data`, domain imports zero Flutter), one Cubit +
+explicit states per feature, DI via providers, manual `fromJson`, and unit tests for every piece of real logic.
 
-## M2 · Data Layer
-- **2.1** DTOs `data/dtos/corpus_dto.dart` (+ Config/Concept/Form/Gloss) — manual fromJson. Test: decode inline JSON.
-- **2.2** `corpus_asset_loader.dart` — rootBundle + jsonDecode; injectable bundle. Test: fake bundle.
-- **2.3** `corpus_repository.dart` — DTO→domain, cache, availableConcepts filtered+ordered, categoryLabel.
-  Test (**real asset**): 8 concepts; both pairs = 8; labels localized; notes preserved.
-- **2.4** `preferences_service.dart` — typed SharedPreferences wrapper. Test: setMockInitialValues.
-- **2.5** `settings_repository.dart` — read/save AppSettings (incl themeMode), defaults. Test: round-trip + defaults.
-- **2.6** `system_clock.dart` — implements Clock.
-- **2.7** Gate + commit `feat(data): dtos, corpus/settings repositories, clock (+tests)`. **CHECK**.
+## S1 - Shared UI kit + Splash (ref: splashscreen_v1.png)
+Goal: reusable component library + first visible screen; validates theme in light/dark.
+- **1.1** `ui/core/widgets/`: `PrimaryButton` (pill teal CTA), `AppScaffold` (bg + safe padding),
+  `SectionCard` (rounded surface card), `Overline` (uppercase muted label), `PageDots`, `BrandMark` (logo mark).
+- **1.2** `ui/features/onboarding/view/splash_screen.dart` - BrandMark + appTitle (serif) + appTagline overline + PageDots.
+- **1.3** Route it as the initial screen (temporary) to see it.
+- **1.4** Widget tests: renders title/tagline; component structure.
+- **CHECK** (run light+dark, both platforms). Commit `feat(ui): shared component kit + splash`.
 
-## M3 · Daily Card (ref: homescreen_v1.png)
-- **3.1** DI wiring at root; provide use cases.
-- **3.2** `DailyState`: DailyLoading / DailyLoaded(expr) / DailyError(message).
-- **3.3** `DailyCubit.load()` (selector + clock). No streak in V1.
-- **3.4** Sub-widgets: top bar (logo + "Daily Expression" + gear), localized date overline,
-  category pill (icon + label), CEFR gold badge, serif idiom headline, italic literal («…»),
-  divider, teal-tinted "ÉQUIVALENT EN {NATIVE}" block, "EN CONTEXTE" card (example bold + translation muted).
-  **No audio button (V2).**
-- **3.5** Non-equivalence callout — discreet, only when isNonEquivalent.
-- **3.6** `DailyView` composes render order; BlocBuilder loading/error/loaded.
-- **3.7** Route `/` → DailyView; remove placeholder; gear → `/settings`.
-- **3.8** Widget tests: fr→en fields; non-equivalent es→en callout; loading/error.
-- **3.9** Manual run iOS + Android (light + dark). **CHECK**. Commit `feat(daily): hero card`.
+## S2 - Onboarding (refs: langage_selection / langage_learning_selection / notification_asking)
+Goal: the 3-step first-run flow; introduces settings persistence + router gate.
+- **2.1** `AppSettings` (+`AppThemeMode`) model, `PreferencesService`, `SettingsRepository`
+  (read/save, defaults 08:00 / system) - round-trip + defaults tests.
+- **2.2** Language list from corpus config (flags/labels) via `LanguageInfo`/`CorpusConfig` (prefer reading config).
+- **2.3** `OnboardingCubit` + `OnboardingState` (step, chosenNative, reminderTime).
+- **2.4** Views (reuse S1 kit): native pick (fr/es selectable; en/de greyed "BIENTOT"; Continuer),
+  target confirm (Anglais locked + description; Commencer), reminders pitch (bell; time picker default 08:00;
+  Activer les rappels / Plus tard).
+- **2.5** Persist `AppSettings` + `onboardingComplete`; permission ask stubbed (real scheduling in S5).
+- **2.6** go_router redirect gate: not-complete -> onboarding; complete -> `/`.
+- **2.7** Cubit + widget tests. **CHECK** (fresh -> onboarding -> home; relaunch skips). Commit `feat(onboarding): first-run flow`.
 
-## M4 · Onboarding (refs: splashscreen / langage_selection / langage_learning_selection / notification_asking)
-- **4.1** OnboardingState/Cubit (step, native, reminder time).
-- **4.2** Splash/intro screen (logo, tagline, page dots) → first launch entry.
-- **4.3** Native pick (fr/es selectable; en/de greyed "BIENTÔT"); Continuer.
-- **4.4** Target confirm (Anglais, locked) + description; Commencer.
-- **4.5** Reminders pitch (bell; "Chaque jour à HH h MM" default 08:00 via time picker; Activer les rappels / Plus tard).
-- **4.6** Persist AppSettings + onboardingComplete; permission ask (graceful deny).
-- **4.7** Router redirect gate (not-complete → onboarding flow).
-- **4.8** Cubit + widget tests. **CHECK** (fresh → onboarding → daily; relaunch skips). Commit.
+## S3 - Daily Card (ref: homescreen_v1.png) - hero + core logic
+Goal: the daily expression screen, backed by the real corpus and the deterministic selector.
+- **3.1** Domain: enums `CefrLevel`/`Register`; VOs `LanguagePair`/`ExpressionForm`/`Gloss`;
+  `Concept` (+`isAvailableFor`); `DailyExpression` (`fromConcept` render order); `CorpusConfig`. Unit tests.
+- **3.2** `Clock` interface + `SystemClock` + `FakeClock` (test/support).
+- **3.3** Data: `data/dtos/` corpus DTOs + `CorpusAssetLoader` + `CorpusRepository` (map/filter/order, categoryLabel).
+  Test against the **real asset** (8 concepts; both pairs = 8; notes preserved).
+- **3.4** Use case `SelectDailyExpression` - anchor 2026-01-01, `idx=((days%n)+n)%n`.
+  **Determinism tests**: same input=>same output, day advance, **midnight rollover**, **wrap-around past concept 8**, negatives.
+- **3.5** `DailyCubit` + `DailyState` (loading/loaded/error). (Optional: render first with a sample expression to
+  nail layout, then wire the selector - explicitly flagged temporary scaffold.)
+- **3.6** Card sub-widgets (reuse kit): top bar (BrandMark + title + gear), date Overline, category pill,
+  CEFR gold badge, serif idiom headline, italic literal, divider, teal-tinted "EQUIVALENT EN {NATIVE}" block,
+  "EN CONTEXTE" SectionCard (example bold + translation muted). **No audio button (V2).**
+- **3.7** Non-equivalence callout - discreet, only when isNonEquivalent.
+- **3.8** `DailyView` composes render order; BlocBuilder states; route `/` -> DailyView; gear -> `/settings`.
+- **3.9** Widget tests (fr->en fields; non-equivalent es->en callout; loading/error). **CHECK** (both platforms, light+dark).
+  Commit `feat(daily): corpus, deterministic selector, hero card (+tests)`.
 
-## M5 · Notifications
-- **5.1** `NotificationService` (init, tz via flutter_timezone, channel, permission, zonedSchedule, cancelAll).
-- **5.2** `NotificationScheduler` wiring BuildReminderWindow (14-day window).
-- **5.3** Schedule after onboarding + on settings change; **5.4** reschedule on resume (WidgetsBindingObserver);
-  **5.5** graceful denial. **5.6** coordinator tests (fake service asserts 14 zoned schedules w/ real idiom bodies).
-- **CHECK** (device: notification shows real idiom; resume refreshes; ≤64 pending). Commit.
+## S4 - Settings (ref: settings_v1.png)
+Goal: preferences screen with a working theme switcher.
+- **4.1** `SettingsCubit` + `SettingsState`.
+- **4.2** View (reuse kit): PREFERENCES (Langue source, Rappel quotidien, Theme Automatique/Clair/Sombre);
+  A PROPOS (A propos de l'app, Laisser un avis); version footer.
+- **4.3** Theme change -> `ThemeCubit` + persist; seed `ThemeCubit` from settings on startup.
+- **4.4** Language / reminder-time changes persist + refresh the daily card.
+- **4.5** Widget + cubit tests. **CHECK**. Commit `feat(settings): preferences + theme switcher`.
 
-## M6 · Settings + Polish (ref: settings_v1.png)
-- **6.1** `SettingsCubit` + view. PRÉFÉRENCES: Langue source, Rappel quotidien, **Thème (Automatique/Clair/Sombre)**;
-  À PROPOS: À propos de l'app, Laisser un avis; footer "Daily Expression · Version x.y.z".
-- **6.2** Theme change → ThemeCubit + persist; language/time change → reschedule + refresh card.
-- **6.3** Full l10n pass (no hardcoded strings). **6.4** empty/error/loading polish.
-- **6.5** Final gate: validate_corpus.py + analyze + test + manual smoke (light+dark, both platforms).
+## S5 - Notifications
+Goal: the daily reminder loop carrying real content.
+- **5.1** Use case `BuildReminderWindow` (14 days, real idiom bodies via SelectDailyExpression) + tests.
+- **5.2** `NotificationService` (init, tz via flutter_timezone, channel, permission, zonedSchedule, cancelAll).
+- **5.3** `NotificationScheduler` coordinator; schedule after onboarding + on settings change;
+  reschedule on resume (WidgetsBindingObserver); graceful denial.
+- **5.4** Coordinator tests (fake service asserts 14 zoned schedules with real idiom bodies).
+- **CHECK** (device: notification shows real idiom; resume refreshes; <=64 pending). Commit `feat(notifications): daily reminder loop`.
+
+## S6 - Polish + Release
+- **6.1** Full l10n pass (no hardcoded strings; fr "tu" / es "tu").
+- **6.2** Empty/error/loading states; transitions; accessibility (text scale, contrast).
+- **6.3** Final gate: `validate_corpus.py` + `flutter analyze` + `flutter test` + manual smoke (light+dark, iOS+Android).
 - **CHECK**. Commit + tag `v0.1.0-mvp`.
 
 ## Cross-cutting conventions
-1. One conventional-commit per milestone.
-2. `test/support/` holds FakeClock, fake repos/bundle, shared fixtures.
-3. Explicit state classes (loading/loaded/error) for every Cubit.
-4. DI via `MultiRepositoryProvider` (constructor injection, no get_it).
-5. `synthetic-package: false` for l10n.
-6. Design = `design/v1/*` (visual truth); skill = scope/invariants; this plan = the rest.
+1. **Reusable components first** - shared widgets in `ui/core/widgets/`; screens compose them, never duplicate.
+2. One conventional-commit per slice.
+3. `test/support/` holds FakeClock, fake repos/bundle, shared fixtures.
+4. Explicit state classes (loading/loaded/error) for every Cubit; immutable models with `==`/`copyWith`.
+5. Layered separation: `ui -> domain <- data`; domain imports zero Flutter; DI via `MultiRepositoryProvider`.
+6. Manual `fromJson` (pattern matching); no codegen/freezed.
+7. Determinism/selector logic is always unit-tested regardless of build order.
+8. Design = `design/v1/*` (visual truth); skill = scope/invariants; this plan = the rest.
 
-## Testing gate (every milestone)
-`python3 assets/scripts/validate_corpus.py` · `flutter analyze` · `flutter test`.
+## Testing gate (every slice)
+`python3 assets/scripts/validate_corpus.py` - `flutter analyze` - `flutter test`.
 
 ## Resolved defaults
-1. Day anchor = `2026-01-01` local.  2. Reminder window = 14 days.  3. Selection wraps (repeats every 8 days) — no anti-repeat in MVP.
+1. Day anchor = `2026-01-01` local.  2. Reminder window = 14 days.  3. Selection wraps (repeats every 8 days) - no anti-repeat in MVP.
 4. `go_router` + redirect gate.  5. No freezed.  6. Reminder default 08:00.  7. Theme = light+dark+auto.
