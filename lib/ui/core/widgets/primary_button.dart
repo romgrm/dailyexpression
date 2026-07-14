@@ -6,7 +6,7 @@ import 'package:daily_expression/ui/core/theme/app_spacing.dart';
 /// "Activer les rappels"). Full width by default; supports an optional trailing
 /// icon (the "→" in the mockups). Styling comes from the app theme's
 /// [FilledButtonThemeData], so it stays consistent everywhere.
-class PrimaryButton extends StatelessWidget {
+final class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
     required this.label,

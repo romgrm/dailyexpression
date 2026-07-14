@@ -1,26 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'domain/models/app_theme_mode.dart';
+import 'data/repositories/corpus_repository.dart';
+import 'data/repositories/settings_repository.dart';
+import 'data/services/corpus_asset_loader.dart';
+import 'domain/models/app_settings.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'ui/core/router/app_router.dart';
+import 'ui/core/settings/settings_cubit.dart';
 import 'ui/core/theme/app_theme.dart';
-import 'ui/core/theme/theme_cubit.dart';
 
-void main() {
-  runApp(const DailyExpressionApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final settingsRepository = SettingsRepository(prefs);
+  final corpusRepository = CorpusRepository(CorpusAssetLoader());
+
+  runApp(
+    DailyExpressionApp(
+      settingsRepository: settingsRepository,
+      corpusRepository: corpusRepository,
+      initialSettings: settingsRepository.read(),
+    ),
+  );
 }
 
 class DailyExpressionApp extends StatelessWidget {
-  const DailyExpressionApp({super.key});
+  const DailyExpressionApp({
+    super.key,
+    required this.settingsRepository,
+    required this.corpusRepository,
+    required this.initialSettings,
+  });
+
+  final SettingsRepository settingsRepository;
+  final CorpusRepository corpusRepository;
+  final AppSettings initialSettings;
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider(create: (_) => ThemeCubit()),
+        RepositoryProvider.value(value: settingsRepository),
+        RepositoryProvider.value(value: corpusRepository),
       ],
-      child: const _AppView(),
+      child: BlocProvider(
+        create: (_) => SettingsCubit(settingsRepository, initialSettings),
+        child: const _AppView(),
+      ),
     );
   }
 }
@@ -33,18 +61,18 @@ class _AppView extends StatefulWidget {
 }
 
 class _AppViewState extends State<_AppView> {
-  final _router = createRouter();
+  late final _router = createRouter(context.read<SettingsCubit>());
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeCubit, AppThemeMode>(
-      builder: (context, mode) {
+    return BlocBuilder<SettingsCubit, AppSettings>(
+      builder: (context, settings) {
         return MaterialApp.router(
           onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
-          themeMode: ThemeCubit.toMaterial(mode),
+          themeMode: settings.themeMode.material,
           routerConfig: _router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// The Daily Expression logo: a rounded, tinted square holding the brand glyph.
 /// Used large on the splash screen and smaller (optionally without the square)
 /// in top bars.
-class Logo extends StatelessWidget {
+final class Logo extends StatelessWidget {
   const Logo({super.key, this.size = 72, this.withBackground = true});
 
   final double size;
