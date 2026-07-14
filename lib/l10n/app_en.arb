@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "appTitle": "Daily Expression",
+  "@appTitle": {
+    "description": "The application name shown in headers and the app bar."
+  },
+  "appTagline": "One expression, every day",
+  "@appTagline": {
+    "description": "Short tagline shown on the splash / intro screen."
+  }
+}
