@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/models/app_theme_mode.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
@@ -85,4 +86,13 @@ abstract final class AppTheme {
       ),
     );
   }
+}
+
+/// Maps the domain [AppThemeMode] to Flutter's [ThemeMode].
+extension AppThemeModeX on AppThemeMode {
+  ThemeMode get material => switch (this) {
+        AppThemeMode.system => ThemeMode.system,
+        AppThemeMode.light => ThemeMode.light,
+        AppThemeMode.dark => ThemeMode.dark,
+      };
 }

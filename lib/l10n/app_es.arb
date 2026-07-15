@@ -1,5 +1,18 @@
 {
   "@@locale": "es",
   "appTitle": "Daily Expression",
-  "appTagline": "Una expresión, cada día"
+  "appTagline": "Una expresión, cada día",
+  "onboardingLanguageTitle": "¿Cuál es tu idioma?",
+  "onboardingLanguageSubtitle": "Elige el idioma desde el que aprendes.",
+  "onboardingComingSoon": "PRONTO",
+  "onboardingTargetTitle": "Quieres aprender…",
+  "onboardingTargetSubtitle": "El idioma objetivo está preseleccionado para ti.",
+  "onboardingTargetDescription": "Cada día, una expresión inglesa auténtica — con su traducción, su equivalente en tu idioma y un ejemplo en contexto.",
+  "onboardingReminderTitle": "Recibe tu expresión del día cada mañana",
+  "onboardingReminderSubtitle": "Un recordatorio discreto a la hora que elijas. Puedes cambiarlo cuando quieras en los ajustes.",
+  "onboardingReminderEveryDayAt": "Cada día a las",
+  "actionContinue": "Continuar",
+  "actionStart": "Empezar",
+  "actionEnableReminders": "Activar los recordatorios",
+  "actionLater": "Más tarde"
 }

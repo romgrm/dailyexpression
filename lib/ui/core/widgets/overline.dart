@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A small uppercase, letter-spaced, muted label — the editorial "overline"
 /// used for section headers and taglines (e.g. "UNE EXPRESSION · CHAQUE JOUR").
-class Overline extends StatelessWidget {
+final class Overline extends StatelessWidget {
   const Overline(this.text, {super.key, this.color, this.textAlign});
 
   final String text;

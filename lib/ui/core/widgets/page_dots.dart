@@ -4,7 +4,7 @@ import 'package:daily_expression/ui/core/theme/app_spacing.dart';
 
 /// Horizontal progress dots for the onboarding flow. The active dot is a wider
 /// teal pill; the rest are small muted dots.
-class PageDots extends StatelessWidget {
+final class PageDots extends StatelessWidget {
   const PageDots({super.key, required this.count, required this.index});
 
   final int count;

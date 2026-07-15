@@ -1,11 +1,18 @@
 {
   "@@locale": "en",
   "appTitle": "Daily Expression",
-  "@appTitle": {
-    "description": "The application name shown in headers and the app bar."
-  },
   "appTagline": "One expression, every day",
-  "@appTagline": {
-    "description": "Short tagline shown on the splash / intro screen."
-  }
+  "onboardingLanguageTitle": "What's your language?",
+  "onboardingLanguageSubtitle": "Choose the language you're learning from.",
+  "onboardingComingSoon": "SOON",
+  "onboardingTargetTitle": "You want to learn…",
+  "onboardingTargetSubtitle": "The target language is preselected for you.",
+  "onboardingTargetDescription": "Every day, an authentic English expression — with its translation, its equivalent in your language, and an example in context.",
+  "onboardingReminderTitle": "Get your expression of the day every morning",
+  "onboardingReminderSubtitle": "A gentle reminder at the time you choose. Change it anytime in settings.",
+  "onboardingReminderEveryDayAt": "Every day at",
+  "actionContinue": "Continue",
+  "actionStart": "Start",
+  "actionEnableReminders": "Enable reminders",
+  "actionLater": "Later"
 }
