@@ -1,16 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/logging/app_log.dart';
-import '../../features/home/view/home_screen.dart';
+import '../../features/daily/view/daily_view.dart';
 import '../../features/onboarding/cubit/onboarding_cubit.dart';
 import '../../features/onboarding/view/onboarding_intro_screen.dart';
 import '../../features/onboarding/view/language_pick_screen.dart';
 import '../../features/onboarding/view/reminders_screen.dart';
 import '../../features/onboarding/view/target_confirm_screen.dart';
+import '../../features/settings/view/settings_screen.dart';
 import '../settings/settings_cubit.dart';
 
 /// Builds the router. Onboarded users land on '/'; others are redirected into
@@ -34,7 +35,14 @@ GoRouter createRouter(SettingsCubit settingsCubit) {
       return target;
     },
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const DailyView(),
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) => BlocProvider(
           create: (_) => OnboardingCubit(),

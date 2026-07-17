@@ -14,5 +14,13 @@
   "actionContinue": "Continuer",
   "actionStart": "Commencer",
   "actionEnableReminders": "Activer les rappels",
-  "actionLater": "Plus tard"
+  "actionLater": "Plus tard",
+  "dailyToday": "Aujourd'hui",
+  "dailyLiteral": "« Littéralement : {image} »",
+  "dailyEquivalentIn": "Équivalent en {language}",
+  "dailyInContext": "En contexte",
+  "dailyExampleTranslation": "« {translation} »",
+  "dailyError": "Impossible de charger l'expression du jour.",
+  "dailyRetry": "Réessayer",
+  "settingsTitle": "Réglages"
 }

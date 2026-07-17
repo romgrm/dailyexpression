@@ -36,8 +36,8 @@ data/     repositories, loaders, storage    depends on → domain
 domain/
   models/     LanguagePair, LanguageInfo, CorpusConfig, AppSettings, AppThemeMode, …
 data/
-  services/   CorpusAssetLoader (loads/decodes corpus.json)
-  repositories/ CorpusRepository (config → models), SettingsRepository (prefs ↔ AppSettings)
+  sources/    CorpusLocalDataSource (loads/decodes corpus.json)
+  repositories/ CorpusRepository (config + concepts → models), SettingsRepository, PrefsDailyLogRepository
 ui/
   core/
     theme/    AppColors, AppTypography, AppTheme, AppSpacing, ThemeCubit
@@ -62,12 +62,17 @@ main.dart     composition root (bootstrap + providers)
   derived from active pairs (adding a pair surfaces a language, no code change).
 
 ### Data
-- **CorpusAssetLoader** — loads and decodes `assets/corpus/corpus.json`
-  (injectable `AssetBundle` for tests).
+- **CorpusLocalDataSource** — loads and decodes `assets/corpus/corpus.json`
+  (injectable `AssetBundle` for tests). The only place that touches the asset
+  bundle; a remote source can later provide the same raw shape.
 - **CorpusRepository** — parses raw corpus JSON into domain models; caches the
-  parsed config. Grows a concept-selection API for the daily card.
+  parsed config and concepts (as Futures). Exposes `availableConcepts(pair)`,
+  `conceptById`, `categoryLabel`.
+- **PrefsDailyLogRepository** — local implementation of the `DailyLogRepository`
+  interface: persists the per-day assignment log (history) in SharedPreferences.
 - **SettingsRepository** — reads/writes `AppSettings` to `SharedPreferences`.
   `read()` is synchronous so startup can resolve the route without an async gap.
+  `ensureUserSeed()` returns the stable per-user seed for daily selection.
 
 ### Design system
 - **AppColors / AppTypography / AppTheme** — Figma light + dark tokens →

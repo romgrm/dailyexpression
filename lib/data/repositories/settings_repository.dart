@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/models/app_settings.dart';
@@ -15,6 +17,7 @@ class SettingsRepository {
   static const _reminderMinuteKey = 'reminder_minute';
   static const _themeModeKey = 'theme_mode';
   static const _onboardingCompleteKey = 'onboarding_complete';
+  static const _userSeedKey = 'user_seed';
 
   AppSettings read() {
     return AppSettings(
@@ -42,5 +45,22 @@ class SettingsRepository {
       (mode) => mode.name == name,
       orElse: () => AppThemeMode.system,
     );
+  }
+
+  /// Returns the stable per-user seed, generating and persisting one on first
+  /// call. This is the identity that makes the daily stream reproducible and
+  /// that a future backend will sync to link a local install to an account.
+  Future<String> ensureUserSeed() async {
+    final existing = _prefs.getString(_userSeedKey);
+    if (existing != null && existing.isNotEmpty) return existing;
+    final seed = _generateSeed();
+    await _prefs.setString(_userSeedKey, seed);
+    return seed;
+  }
+
+  static String _generateSeed() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+    return bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
   }
 }

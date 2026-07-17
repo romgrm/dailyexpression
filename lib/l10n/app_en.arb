@@ -14,5 +14,22 @@
   "actionContinue": "Continue",
   "actionStart": "Start",
   "actionEnableReminders": "Enable reminders",
-  "actionLater": "Later"
+  "actionLater": "Later",
+  "dailyToday": "Today",
+  "dailyLiteral": "“Literally: {image}”",
+  "@dailyLiteral": {
+    "placeholders": { "image": { "type": "String" } }
+  },
+  "dailyEquivalentIn": "Equivalent in {language}",
+  "@dailyEquivalentIn": {
+    "placeholders": { "language": { "type": "String" } }
+  },
+  "dailyInContext": "In context",
+  "dailyExampleTranslation": "“{translation}”",
+  "@dailyExampleTranslation": {
+    "placeholders": { "translation": { "type": "String" } }
+  },
+  "dailyError": "Couldn't load today's expression.",
+  "dailyRetry": "Retry",
+  "settingsTitle": "Settings"
 }
