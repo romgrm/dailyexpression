@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/logging/app_log.dart';
 import 'data/repositories/corpus_repository.dart';
 import 'data/repositories/settings_repository.dart';
-import 'data/services/corpus_asset_loader.dart';
+import 'data/sources/corpus_local_data_source.dart';
 import 'domain/models/app_settings.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'ui/core/router/app_router.dart';
@@ -16,7 +16,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final settingsRepository = SettingsRepository(prefs);
-  final corpusRepository = CorpusRepository(CorpusAssetLoader());
+  final corpusRepository = CorpusRepository(CorpusLocalDataSource());
   final initialSettings = settingsRepository.read();
   logger.d(
     '[bootstrap] onboardingComplete=${initialSettings.onboardingComplete}, '

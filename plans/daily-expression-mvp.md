@@ -179,24 +179,84 @@ Goal: the 3-step first-run flow; introduces settings persistence + router gate.
 - **2.6** go_router redirect gate: not-complete -> onboarding; complete -> `/`.
 - **2.7** Cubit + widget tests. **CHECK** (fresh -> onboarding -> home; relaunch skips). Commit `feat(onboarding): first-run flow`.
 
+## Daily selection & data model - CORE DESIGN (revised 2026-07-17)
+The daily pick is the product's core. It must stay correct as the corpus grows and as premium
+features (history, favorites, themes, multi-language) and a Supabase backend arrive later - with
+NO breaking changes for existing users. Design decisions below supersede the old anchor+modulo idea.
+
+### Decisions (locked with the user)
+- **Per-user stream** (deterministic via a persisted `userSeed`), NOT a global "same expression for
+  everyone today". Rationale: the social/shared angle is weak for idiom learning; per-user unlocks
+  personalized history/themes.
+- **Persisted daily log built now (S3)**, stored **local-only** (shared_preferences) behind a
+  `DailyLogRepository` interface. Reinstall / 2nd-device history loss accepted before the backend.
+- **Selection dedupes on `conceptId`**, never on date or category. "Seen" = set of `conceptId` in the log.
+- **Category is display + future theme filter only** - it has ZERO effect on selection. Many concepts
+  can share a category (e.g. several `weather`). The only hard rule: each `concept.id` is unique & stable.
+- **Exhaustion** (~8 concepts today): reshuffle, avoiding immediate repeats (skip last-K seen). Optional
+  future rule: avoid same category as the previous day (not needed for MVP).
+- **Day boundary** = device LOCAL calendar day (matches the 08:00 local reminder).
+- **Content lifecycle**: never delete an assigned concept; mark `active:false` to drop it from future
+  pools while keeping it resolvable by id for history (documented; not enforced in MVP code).
+
+### Log entry shape (local now, Supabase-ready)
+`{ dayKey: "2026-07-17", pairKey: "en_fr", conceptId: "rain_heavy", assignedAt: <ts>, schemaVersion: 1 }`
+Natural key = `(dayKey, pairKey)` locally, `(user_id, pair_key, day_key)` on the server.
+`schemaVersion` + `assignedAt` are baked in from the first commit as migration/merge insurance.
+
+### Algorithm - `GetDailyExpression(now)` (resolve-or-assign)
+```
+dayKey  = localDayKey(clock.now()); pairKey = '${target}_${native}'
+existing = log.forDay(dayKey, pairKey)
+if existing != null: return corpus.byId(existing.conceptId).renderFor(pair)   // frozen history
+pool    = corpus.availableConcepts(pair)            // + theme/level filters later
+seen    = log.history(pairKey).map((e) => e.conceptId).toSet()
+cands   = pool.where((c) => !seen.contains(c.id))
+if cands.isEmpty: cands = pool.where((c) => !lastK(seen).contains(c.id))       // reshuffle
+pick    = cands.minBy((c) => stableHash('$userSeed|$pairKey|$dayKey|${c.id}'))
+log.save(DailyAssignment(dayKey, pick.id, pairKey)); return pick.renderFor(pair)
+```
+Deterministic given (userSeed, clock, log, pool). Past days are frozen; adding concepts only enlarges
+FUTURE candidate pools - never rewrites history.
+
+### Backend evolution (Supabase - later, premium milestone)
+- Table `daily_log (user_id, pair_key, day_key, concept_id, assigned_at, schema_version)`,
+  PK `(user_id, pair_key, day_key)` = the local natural key.
+- Migration = idempotent `upsert(onConflict: 'user_id,pair_key,day_key', ignoreDuplicates: true)`;
+  device conflicts resolved by earliest `assigned_at` (first writer wins).
+- **RLS** `auth.uid() = user_id` -> each user only reads/writes their own rows.
+- **Anonymous auth** bridges existing local users: local log uploads under an anon session, later linked
+  to a real identity (email/OAuth) without losing history.
+- **Content stays bundled/CDN** (referenced by `concept_id`), never stored in Postgres -> corpus and
+  user data evolve independently. Offline-first preserved: local log is the working store, Supabase syncs.
+- Everything is a NEW `DailyLogRepository` implementation - `GetDailyExpression` and the UI are untouched.
+
 ## S3 - Daily Card (ref: homescreen_v1.png) - hero + core logic
-Goal: the daily expression screen, backed by the real corpus and the deterministic selector.
+Goal: the daily expression screen, backed by the real corpus and the deterministic PERSISTED selector.
 - **3.1** Domain: enums `CefrLevel`/`Register`; VOs `LanguagePair`/`ExpressionForm`/`Gloss`;
-  `Concept` (+`isAvailableFor`); `DailyExpression` (`fromConcept` render order); `CorpusConfig`. Unit tests.
-- **3.2** `Clock` interface + `SystemClock` + `FakeClock` (test/support).
-- **3.3** Data: `data/dtos/` corpus DTOs + `CorpusAssetLoader` + `CorpusRepository` (map/filter/order, categoryLabel).
-  Test against the **real asset** (8 concepts; both pairs = 8; notes preserved).
-- **3.4** Use case `SelectDailyExpression` - anchor 2026-01-01, `idx=((days%n)+n)%n`.
-  **Determinism tests**: same input=>same output, day advance, **midnight rollover**, **wrap-around past concept 8**, negatives.
-- **3.5** `DailyCubit` + `DailyState` (loading/loaded/error). (Optional: render first with a sample expression to
-  nail layout, then wire the selector - explicitly flagged temporary scaffold.)
-- **3.6** Card sub-widgets (reuse kit): top bar (BrandMark + title + gear), date Overline, category pill,
-  CEFR gold badge, serif idiom headline, italic literal, divider, teal-tinted "EQUIVALENT EN {NATIVE}" block,
-  "EN CONTEXTE" SectionCard (example bold + translation muted). **No audio button (V2).**
-- **3.7** Non-equivalence callout - discreet, only when isNonEquivalent.
-- **3.8** `DailyView` composes render order; BlocBuilder states; route `/` -> DailyView; gear -> `/settings`.
-- **3.9** Widget tests (fr->en fields; non-equivalent es->en callout; loading/error). **CHECK** (both platforms, light+dark).
-  Commit `feat(daily): corpus, deterministic selector, hero card (+tests)`.
+  `Concept` (+`isAvailableFor`); `DailyExpression` (`fromConcept` render order); `CorpusConfig`;
+  `DailyAssignment {dayKey, conceptId, pairKey, assignedAt, schemaVersion}`. Unit tests.
+- **3.2** `Clock` interface + `SystemClock` + `FakeClock` (test/support) + `localDayKey(DateTime)` helper.
+- **3.3** Data: `data/dtos/` corpus DTOs + `CorpusAssetLoader` + `CorpusRepository`
+  (`availableConcepts(pair)` / `byId` / `categoryLabel`). Test against the **real asset**
+  (8 concepts; both pairs = 8; notes preserved).
+- **3.4** Persistence: `DailyLogRepository` interface + `PrefsDailyLogRepository` (shared_preferences
+  JSON list): `forDay(dayKey,pairKey)` / `history(pairKey)` / `save(assignment)`. Round-trip tests.
+  `userSeed` generated once at first launch, persisted in settings, injected into the use case.
+- **3.5** Use case `GetDailyExpression` (resolve-or-assign, per Core Design) + deterministic `stableHash`.
+  **Determinism tests**: same (seed,day,pool)=>same id; day advance; **midnight rollover**;
+  **no-repeat until exhausted**; **reshuffle avoids last-K**; **frozen replay** (re-resolving a logged
+  day returns the logged id even after the pool grows).
+- **3.6** `DailyCubit` + `DailyState` (loading/loaded/error). (Optional: render first with a sample
+  expression to nail layout, then wire the use case - explicitly flagged temporary scaffold.)
+- **3.7** Card sub-widgets (reuse kit): top bar (Logo + title + gear), date Overline, category `Pill`,
+  CEFR gold badge, serif idiom headline, italic literal, divider, teal-tinted "EQUIVALENT EN {NATIVE}"
+  block, "EN CONTEXTE" SectionCard (example bold + translation muted). **No audio button (V2).**
+- **3.8** Non-equivalence callout - discreet, only when `isNonEquivalent` (gloss.note != null).
+- **3.9** `DailyView` composes render order; BlocBuilder states; route `/` -> DailyView; gear -> `/settings`.
+- **3.10** Widget tests (fr->en fields; non-equivalent es->en callout; loading/error). **CHECK**
+  (both platforms, light+dark; relaunch same day = same expression; next day = new; day 9 reshuffles
+  without immediate repeat). Commit `feat(daily): stable-id deterministic selector + daily log + hero card`.
 
 ## S4 - Settings (ref: settings_v1.png)
 Goal: preferences screen with a working theme switcher.

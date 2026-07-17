@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 
-/// Loads and decodes the bundled corpus asset into a raw JSON map.
-class CorpusAssetLoader {
-  CorpusAssetLoader({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
+/// Local data source for the corpus: loads and decodes the bundled
+/// `corpus.json` asset into a raw JSON map. This is the only place that touches
+/// the asset bundle; a remote data source can later provide the same raw shape.
+class CorpusLocalDataSource {
+  CorpusLocalDataSource({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
 
   final AssetBundle _bundle;
 
