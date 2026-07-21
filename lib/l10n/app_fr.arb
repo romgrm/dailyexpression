@@ -22,5 +22,17 @@
   "dailyExampleTranslation": "« {translation} »",
   "dailyError": "Impossible de charger l'expression du jour.",
   "dailyRetry": "Réessayer",
-  "settingsTitle": "Réglages"
+  "settingsTitle": "Réglages",
+  "settingsPreferences": "Préférences",
+  "settingsAbout": "À propos",
+  "settingsSourceLanguage": "Langue source",
+  "settingsDailyReminder": "Rappel quotidien",
+  "settingsTheme": "Thème",
+  "settingsThemeSystem": "Automatique",
+  "settingsThemeLight": "Clair",
+  "settingsThemeDark": "Sombre",
+  "settingsAboutApp": "À propos de l'app",
+  "settingsLeaveReview": "Laisser un avis",
+  "settingsComingSoon": "Bientôt disponible",
+  "settingsVersion": "Version {version}"
 }

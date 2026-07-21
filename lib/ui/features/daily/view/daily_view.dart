@@ -21,10 +21,11 @@ final class DailyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsCubit>().state;
     final uiLanguageCode = Localizations.localeOf(context).languageCode;
-    final nativeLanguageCode =
-        context.read<SettingsCubit>().state.nativeLanguage ?? 'fr';
+    final nativeLanguageCode = settings.nativeLanguage ?? 'fr';
     return BlocProvider(
+      key: ValueKey(nativeLanguageCode),
       create: (context) => DailyCubit(
         corpus: context.read<CorpusRepository>(),
         getDailyExpression: context.read<GetDailyExpression>(),
@@ -94,7 +95,7 @@ final class _TopBar extends StatelessWidget {
         Text(l10n.appTitle, style: theme.textTheme.titleLarge),
         const Spacer(),
         IconButton(
-          onPressed: () => context.go('/settings'),
+          onPressed: () => context.push('/settings'),
           icon: const Icon(Icons.settings_outlined),
           tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
         ),

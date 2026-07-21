@@ -31,5 +31,20 @@
   },
   "dailyError": "Couldn't load today's expression.",
   "dailyRetry": "Retry",
-  "settingsTitle": "Settings"
+  "settingsTitle": "Settings",
+  "settingsPreferences": "Preferences",
+  "settingsAbout": "About",
+  "settingsSourceLanguage": "Source language",
+  "settingsDailyReminder": "Daily reminder",
+  "settingsTheme": "Theme",
+  "settingsThemeSystem": "Automatic",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
+  "settingsAboutApp": "About the app",
+  "settingsLeaveReview": "Leave a review",
+  "settingsComingSoon": "Coming soon",
+  "settingsVersion": "Version {version}",
+  "@settingsVersion": {
+    "placeholders": { "version": { "type": "String" } }
+  }
 }

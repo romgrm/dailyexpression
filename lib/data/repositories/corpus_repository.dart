@@ -21,7 +21,8 @@ class CorpusRepository {
 
   Future<Map<String, dynamic>> _rawData() => _rawFuture ??= _source.loadRaw();
 
-  Future<CorpusConfig> loadConfig() => _configFuture ??= _parseConfigFromAsset();
+  Future<CorpusConfig> loadConfig() =>
+      _configFuture ??= _parseConfigFromAsset();
 
   Future<CorpusConfig> _parseConfigFromAsset() async {
     final config = _parseConfig(

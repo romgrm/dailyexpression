@@ -22,7 +22,8 @@ void main() {
     expect(config.categoryLabel('weather', 'fr'), 'Météo');
   });
 
-  test('availableConcepts returns all concepts for both active pairs', () async {
+  test('availableConcepts returns all concepts for both active pairs',
+      () async {
     final repo = CorpusRepository(CorpusLocalDataSource());
 
     final frEn = await repo.availableConcepts(
@@ -47,4 +48,3 @@ void main() {
     expect(rain.glosses['en_fr']?.isNonEquivalent, isFalse);
   });
 }
-
