@@ -16,7 +16,7 @@ final class OnboardingIntroScreen extends StatefulWidget {
 }
 
 final class _OnboardingIntroScreenState extends State<OnboardingIntroScreen> {
-  static const _introDuration = Duration(milliseconds: 1500);
+  static const _introDuration = Duration(milliseconds: 3000);
   Timer? _timer;
 
   @override
