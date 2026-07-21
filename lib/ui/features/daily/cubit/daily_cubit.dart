@@ -51,7 +51,8 @@ class DailyCubit extends Cubit<DailyState> {
         categoryLabel: config.categoryLabel(concept.category, _uiLanguageCode),
       );
       final nativeName =
-          config.languageByCode(pair.native)?.nameNative ?? pair.native;
+          config.languageByCode(pair.native)?.displayName(_uiLanguageCode) ??
+              pair.native;
       logger.d('[daily] loaded ${concept.id} for ${pair.glossKey}');
       emit(DailyLoaded(
         date: _clock.now(),

@@ -22,5 +22,18 @@
   "dailyExampleTranslation": "« {translation} »",
   "dailyError": "No se pudo cargar la expresión de hoy.",
   "dailyRetry": "Reintentar",
-  "settingsTitle": "Ajustes"
+  "settingsTitle": "Ajustes",
+  "settingsPreferences": "Preferencias",
+  "settingsAbout": "Acerca de",
+  "settingsSourceLanguage": "Idioma de origen",
+  "settingsAppLanguage": "Idioma de la app",
+  "settingsDailyReminder": "Recordatorio diario",
+  "settingsTheme": "Tema",
+  "settingsThemeSystem": "Automático",
+  "settingsThemeLight": "Claro",
+  "settingsThemeDark": "Oscuro",
+  "settingsAboutApp": "Acerca de la app",
+  "settingsLeaveReview": "Dejar una reseña",
+  "settingsComingSoon": "Próximamente",
+  "settingsVersion": "Versión {version}"
 }
