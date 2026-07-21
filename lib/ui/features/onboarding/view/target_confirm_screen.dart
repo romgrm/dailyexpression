@@ -47,6 +47,7 @@ final class _TargetView extends StatelessWidget {
         onboarding.targetCode ?? (targets.length == 1 ? targets.first : null);
 
     return AppScaffold(
+      showBack: true,
       bottomAction: PrimaryButton(
         label: l10n.actionStart,
         trailingIcon: Icons.arrow_forward,
@@ -54,7 +55,7 @@ final class _TargetView extends StatelessWidget {
             ? null
             : () {
                 context.read<OnboardingCubit>().selectTarget(selected);
-                context.go('/onboarding/reminders');
+                context.push('/onboarding/reminders');
               },
       ),
       body: ListView(

@@ -103,6 +103,18 @@ class _AppViewState extends State<_AppView> {
           darkTheme: AppTheme.dark,
           themeMode: settings.themeMode.material,
           locale: appLocale != null ? Locale(appLocale) : null,
+          localeResolutionCallback: (deviceLocale, supportedLocales) {
+            final preferred =
+                appLocale != null ? Locale(appLocale) : deviceLocale;
+            if (preferred != null) {
+              for (final locale in supportedLocales) {
+                if (locale.languageCode == preferred.languageCode) {
+                  return locale;
+                }
+              }
+            }
+            return const Locale('en');
+          },
           routerConfig: _router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

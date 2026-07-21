@@ -51,7 +51,7 @@ final class _LanguagePickView extends StatelessWidget {
       bottomAction: PrimaryButton(
         label: l10n.actionContinue,
         onPressed:
-            selected == null ? null : () => context.go('/onboarding/target'),
+            selected == null ? null : () => context.push('/onboarding/target'),
       ),
       body: ListView(
         children: [

@@ -9,16 +9,29 @@ final class AppScaffold extends StatelessWidget {
     super.key,
     required this.body,
     this.bottomAction,
+    this.showBack = false,
     this.padding = const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
   });
 
   final Widget body;
   final Widget? bottomAction;
+
+  /// When true, shows a transparent leading back button that pops the current
+  /// route (used for reversible onboarding steps).
+  final bool showBack;
   final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: showBack
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              leading: const BackButton(),
+            )
+          : null,
       body: SafeArea(child: Padding(padding: padding, child: body)),
       bottomNavigationBar: bottomAction == null
           ? null

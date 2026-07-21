@@ -33,6 +33,7 @@ final class RemindersScreen extends StatelessWidget {
     }
 
     return AppScaffold(
+      showBack: true,
       bottomAction: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
