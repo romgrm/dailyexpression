@@ -35,6 +35,7 @@
   "settingsPreferences": "Preferences",
   "settingsAbout": "About",
   "settingsSourceLanguage": "Source language",
+  "settingsAppLanguage": "App language",
   "settingsDailyReminder": "Daily reminder",
   "settingsTheme": "Theme",
   "settingsThemeSystem": "Automatic",

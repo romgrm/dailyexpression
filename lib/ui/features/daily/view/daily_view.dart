@@ -25,7 +25,7 @@ final class DailyView extends StatelessWidget {
     final uiLanguageCode = Localizations.localeOf(context).languageCode;
     final nativeLanguageCode = settings.nativeLanguage ?? 'fr';
     return BlocProvider(
-      key: ValueKey(nativeLanguageCode),
+      key: ValueKey('$nativeLanguageCode|$uiLanguageCode'),
       create: (context) => DailyCubit(
         corpus: context.read<CorpusRepository>(),
         getDailyExpression: context.read<GetDailyExpression>(),

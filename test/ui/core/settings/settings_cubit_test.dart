@@ -21,10 +21,10 @@ void main() {
     expect(repo.read().themeMode, AppThemeMode.dark);
   });
 
-  test('setNativeLanguage updates state and persists', () async {
-    await cubit.setNativeLanguage('es');
-    expect(cubit.state.nativeLanguage, 'es');
-    expect(repo.read().nativeLanguage, 'es');
+  test('setAppLanguage updates state and persists', () async {
+    await cubit.setAppLanguage('en');
+    expect(cubit.state.appLanguage, 'en');
+    expect(repo.read().appLanguage, 'en');
   });
 
   test('setReminderTime updates state and persists', () async {

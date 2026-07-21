@@ -95,12 +95,14 @@ class _AppViewState extends State<_AppView> {
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsCubit, AppSettings>(
       builder: (context, settings) {
+        final appLocale = settings.appLanguage ?? settings.nativeLanguage;
         return MaterialApp.router(
           onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
           themeMode: settings.themeMode.material,
+          locale: appLocale != null ? Locale(appLocale) : null,
           routerConfig: _router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

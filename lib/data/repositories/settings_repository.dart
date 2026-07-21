@@ -18,10 +18,12 @@ class SettingsRepository {
   static const _themeModeKey = 'theme_mode';
   static const _onboardingCompleteKey = 'onboarding_complete';
   static const _userSeedKey = 'user_seed';
+  static const _appLanguageKey = 'app_language';
 
   AppSettings read() {
     return AppSettings(
       nativeLanguage: _prefs.getString(_nativeLanguageKey),
+      appLanguage: _prefs.getString(_appLanguageKey),
       reminderHour: _prefs.getInt(_reminderHourKey) ?? 8,
       reminderMinute: _prefs.getInt(_reminderMinuteKey) ?? 0,
       themeMode: _themeModeFromName(_prefs.getString(_themeModeKey)),
@@ -33,6 +35,10 @@ class SettingsRepository {
     final native = settings.nativeLanguage;
     if (native != null) {
       await _prefs.setString(_nativeLanguageKey, native);
+    }
+    final appLanguage = settings.appLanguage;
+    if (appLanguage != null) {
+      await _prefs.setString(_appLanguageKey, appLanguage);
     }
     await _prefs.setInt(_reminderHourKey, settings.reminderHour);
     await _prefs.setInt(_reminderMinuteKey, settings.reminderMinute);

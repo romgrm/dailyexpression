@@ -49,7 +49,12 @@ final class _SettingsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final appLang = settings.appLanguage ?? settings.nativeLanguage ?? 'fr';
     final native = config.languageByCode(settings.nativeLanguage ?? '');
+    final target = config.languageByCode('en');
+    final pairValue = (native == null || target == null)
+        ? null
+        : '${native.displayName(appLang)} → ${target.displayName(appLang)}';
     final reminder = TimeOfDay(
       hour: settings.reminderHour,
       minute: settings.reminderMinute,
@@ -62,11 +67,19 @@ final class _SettingsBody extends StatelessWidget {
           title: l10n.settingsPreferences,
           children: [
             _SettingsRow(
-              icon: Icons.translate_outlined,
+              icon: Icons.school_outlined,
               title: l10n.settingsSourceLanguage,
-              value:
-                  native == null ? null : '${native.flag}  ${native.nameNative}',
-              onTap: () => _pickLanguage(context),
+              value: pairValue,
+              trailing: const Icon(Icons.lock_outline, size: AppSpacing.lg),
+              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.settingsComingSoon)),
+              ),
+            ),
+            _SettingsRow(
+              icon: Icons.language_outlined,
+              title: l10n.settingsAppLanguage,
+              value: config.languageByCode(appLang)?.nameNative,
+              onTap: () => _pickAppLanguage(context, appLang),
             ),
             _SettingsRow(
               icon: Icons.notifications_outlined,
@@ -123,32 +136,27 @@ final class _SettingsBody extends StatelessWidget {
         AppThemeMode.dark => l10n.settingsThemeDark,
       };
 
-  Future<void> _pickLanguage(BuildContext context) async {
+  Future<void> _pickAppLanguage(BuildContext context, String current) async {
     final cubit = context.read<SettingsCubit>();
+    final codes = <String>{settings.nativeLanguage ?? 'fr', 'en'};
     final selected = await showModalBottomSheet<String>(
       context: context,
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            for (final code in config.selectableNativeCodes)
+            for (final code in codes)
               if (config.languageByCode(code) case final info?)
                 ListTile(
-                  leading: Text(
-                    info.flag,
-                    style: Theme.of(sheetContext).textTheme.titleLarge,
-                  ),
                   title: Text(info.nameNative),
-                  trailing: code == settings.nativeLanguage
-                      ? const Icon(Icons.check)
-                      : null,
+                  trailing: code == current ? const Icon(Icons.check) : null,
                   onTap: () => Navigator.of(sheetContext).pop(code),
                 ),
           ],
         ),
       ),
     );
-    if (selected != null) await cubit.setNativeLanguage(selected);
+    if (selected != null) await cubit.setAppLanguage(selected);
   }
 
   Future<void> _pickReminderTime(
@@ -223,12 +231,14 @@ final class _SettingsRow extends StatelessWidget {
     required this.title,
     this.value,
     this.onTap,
+    this.trailing,
   });
 
   final IconData icon;
   final String title;
   final String? value;
   final VoidCallback? onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +265,12 @@ final class _SettingsRow extends StatelessWidget {
               ),
               const Sizer.xs(),
             ],
-            if (onTap != null)
+            if (trailing != null)
+              IconTheme(
+                data: IconThemeData(color: scheme.onSurfaceVariant),
+                child: trailing!,
+              )
+            else if (onTap != null)
               Icon(
                 Icons.chevron_right,
                 size: AppSpacing.lg,

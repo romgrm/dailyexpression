@@ -30,6 +30,7 @@ class SettingsCubit extends Cubit<AppSettings> {
     return _persist(
       state.copyWith(
         nativeLanguage: nativeLanguage,
+        appLanguage: nativeLanguage,
         reminderHour: reminderHour,
         reminderMinute: reminderMinute,
         onboardingComplete: true,
@@ -40,8 +41,8 @@ class SettingsCubit extends Cubit<AppSettings> {
   Future<void> setThemeMode(AppThemeMode mode) =>
       _persist(state.copyWith(themeMode: mode));
 
-  Future<void> setNativeLanguage(String code) =>
-      _persist(state.copyWith(nativeLanguage: code));
+  Future<void> setAppLanguage(String code) =>
+      _persist(state.copyWith(appLanguage: code));
 
   Future<void> setReminderTime(int hour, int minute) =>
       _persist(state.copyWith(reminderHour: hour, reminderMinute: minute));

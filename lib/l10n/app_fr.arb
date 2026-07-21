@@ -26,6 +26,7 @@
   "settingsPreferences": "Préférences",
   "settingsAbout": "À propos",
   "settingsSourceLanguage": "Langue source",
+  "settingsAppLanguage": "Langue de l'app",
   "settingsDailyReminder": "Rappel quotidien",
   "settingsTheme": "Thème",
   "settingsThemeSystem": "Automatique",
