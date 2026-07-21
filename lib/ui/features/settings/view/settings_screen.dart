@@ -51,7 +51,7 @@ final class _SettingsBody extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final appLang = settings.appLanguage ?? settings.nativeLanguage ?? 'fr';
     final native = config.languageByCode(settings.nativeLanguage ?? '');
-    final target = config.languageByCode('en');
+    final target = config.languageByCode(settings.targetLanguage ?? 'en');
     final pairValue = (native == null || target == null)
         ? null
         : '${native.displayName(appLang)} → ${target.displayName(appLang)}';
@@ -138,7 +138,10 @@ final class _SettingsBody extends StatelessWidget {
 
   Future<void> _pickAppLanguage(BuildContext context, String current) async {
     final cubit = context.read<SettingsCubit>();
-    final codes = <String>{settings.nativeLanguage ?? 'fr', 'en'};
+    final codes = <String>{
+      settings.nativeLanguage ?? 'fr',
+      settings.targetLanguage ?? 'en',
+    };
     final selected = await showModalBottomSheet<String>(
       context: context,
       builder: (sheetContext) => SafeArea(

@@ -8,7 +8,7 @@ import 'package:daily_expression/domain/time/clock.dart';
 import 'package:daily_expression/domain/use_cases/get_daily_expression.dart';
 import 'daily_state.dart';
 
-/// Loads today's expression for the user's pair (native -> English) and exposes
+/// Loads today's expression for the user's pair (native -> target) and exposes
 /// it as UI state. Selection determinism lives in [GetDailyExpression]; this
 /// cubit only orchestrates fetching the pool, resolving, and projecting.
 class DailyCubit extends Cubit<DailyState> {
@@ -18,11 +18,13 @@ class DailyCubit extends Cubit<DailyState> {
     required Clock clock,
     required String uiLanguageCode,
     required String nativeLanguageCode,
+    required String targetLanguageCode,
   })  : _corpus = corpus,
         _getDailyExpression = getDailyExpression,
         _clock = clock,
         _uiLanguageCode = uiLanguageCode,
         _nativeLanguageCode = nativeLanguageCode,
+        _targetLanguageCode = targetLanguageCode,
         super(const DailyLoading()) {
     load();
   }
@@ -32,8 +34,7 @@ class DailyCubit extends Cubit<DailyState> {
   final Clock _clock;
   final String _uiLanguageCode;
   final String _nativeLanguageCode;
-
-  static const _targetLanguageCode = 'en';
+  final String _targetLanguageCode;
 
   Future<void> load() async {
     emit(const DailyLoading());
@@ -45,10 +46,15 @@ class DailyCubit extends Cubit<DailyState> {
       final config = await _corpus.loadConfig();
       final pool = await _corpus.availableConcepts(pair);
       final concept = await _getDailyExpression(pair: pair, pool: pool);
+      final variantCode = concept.forms[pair.target]?.variant;
       final expression = DailyExpression.fromConcept(
         concept,
         pair,
         categoryLabel: config.categoryLabel(concept.category, _uiLanguageCode),
+        noEquivalentText: config.noEquivalentFor(pair.native),
+        variantLabel: variantCode == null
+            ? null
+            : config.variantLabel(variantCode, _uiLanguageCode),
       );
       final nativeName =
           config.languageByCode(pair.native)?.displayName(_uiLanguageCode) ??

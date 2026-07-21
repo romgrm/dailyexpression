@@ -11,7 +11,10 @@ import '../../../support/in_memory_daily_log.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  DailyCubit buildCubit(String nativeCode) {
+  DailyCubit buildCubit({
+    required String native,
+    required String target,
+  }) {
     final clock = FakeClock(DateTime(2026, 7, 17));
     return DailyCubit(
       corpus: CorpusRepository(CorpusLocalDataSource()),
@@ -22,24 +25,25 @@ void main() {
       ),
       clock: clock,
       uiLanguageCode: 'fr',
-      nativeLanguageCode: nativeCode,
+      nativeLanguageCode: native,
+      targetLanguageCode: target,
     );
   }
 
   test('loads today\'s expression for fr -> en', () async {
-    final cubit = buildCubit('fr');
+    final cubit = buildCubit(native: 'fr', target: 'en');
     await cubit.stream.firstWhere((state) => state is! DailyLoading);
 
     final state = cubit.state;
     expect(state, isA<DailyLoaded>());
     final loaded = state as DailyLoaded;
     expect(loaded.expression.idiom, isNotEmpty);
-    expect(loaded.expression.nativeEquivalent, isNotEmpty);
+    expect(loaded.expression.nativeEquivalentOrPlaceholder, isNotEmpty);
     expect(loaded.nativeLanguageName, 'Français');
   });
 
   test('emits DailyError for a pair with no concepts', () async {
-    final cubit = buildCubit('de'); // 'de' is not an active native language
+    final cubit = buildCubit(native: 'de', target: 'en');
     await cubit.stream.firstWhere((state) => state is! DailyLoading);
 
     expect(cubit.state, isA<DailyError>());

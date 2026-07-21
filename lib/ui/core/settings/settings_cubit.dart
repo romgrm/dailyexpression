@@ -24,12 +24,14 @@ class SettingsCubit extends Cubit<AppSettings> {
 
   Future<void> completeOnboarding({
     required String nativeLanguage,
+    required String targetLanguage,
     required int reminderHour,
     required int reminderMinute,
   }) {
     return _persist(
       state.copyWith(
         nativeLanguage: nativeLanguage,
+        targetLanguage: targetLanguage,
         appLanguage: nativeLanguage,
         reminderHour: reminderHour,
         reminderMinute: reminderMinute,

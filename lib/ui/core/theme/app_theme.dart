@@ -9,11 +9,11 @@ abstract final class AppTheme {
   AppTheme._();
 
   static ThemeData get light =>
-      _build(_lightScheme, AppColors.lightBackground);
+      _build(lightColorScheme, AppColors.lightBackground);
 
-  static ThemeData get dark => _build(_darkScheme, AppColors.darkBackground);
+  static ThemeData get dark => _build(darkColorScheme, AppColors.darkBackground);
 
-  static const _lightScheme = ColorScheme(
+  static const lightColorScheme = ColorScheme(
     brightness: Brightness.light,
     primary: AppColors.lightPrimary,
     onPrimary: AppColors.lightOnPrimary,
@@ -33,7 +33,7 @@ abstract final class AppTheme {
     onError: AppColors.lightOnError,
   );
 
-  static const _darkScheme = ColorScheme(
+  static const darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
     primary: AppColors.darkPrimary,
     onPrimary: AppColors.darkOnPrimary,

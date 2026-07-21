@@ -38,7 +38,12 @@ DailyExpression expressionWith({String? note}) {
     },
     tags: const [],
   );
-  return DailyExpression.fromConcept(concept, _pair, categoryLabel: 'Météo');
+  return DailyExpression.fromConcept(
+    concept,
+    _pair,
+    categoryLabel: 'Météo',
+    noEquivalentText: 'Pas d\'équivalent direct en français',
+  );
 }
 
 Widget wrap(Widget child) => MaterialApp(

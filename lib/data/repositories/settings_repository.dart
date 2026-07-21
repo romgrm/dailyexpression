@@ -13,6 +13,7 @@ class SettingsRepository {
   final SharedPreferences _prefs;
 
   static const _nativeLanguageKey = 'native_language';
+  static const _targetLanguageKey = 'target_language';
   static const _reminderHourKey = 'reminder_hour';
   static const _reminderMinuteKey = 'reminder_minute';
   static const _themeModeKey = 'theme_mode';
@@ -23,6 +24,7 @@ class SettingsRepository {
   AppSettings read() {
     return AppSettings(
       nativeLanguage: _prefs.getString(_nativeLanguageKey),
+      targetLanguage: _prefs.getString(_targetLanguageKey),
       appLanguage: _prefs.getString(_appLanguageKey),
       reminderHour: _prefs.getInt(_reminderHourKey) ?? 8,
       reminderMinute: _prefs.getInt(_reminderMinuteKey) ?? 0,
@@ -35,6 +37,10 @@ class SettingsRepository {
     final native = settings.nativeLanguage;
     if (native != null) {
       await _prefs.setString(_nativeLanguageKey, native);
+    }
+    final target = settings.targetLanguage;
+    if (target != null) {
+      await _prefs.setString(_targetLanguageKey, target);
     }
     final appLanguage = settings.appLanguage;
     if (appLanguage != null) {

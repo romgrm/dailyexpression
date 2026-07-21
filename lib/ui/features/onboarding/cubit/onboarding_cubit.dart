@@ -13,6 +13,11 @@ final class OnboardingCubit extends Cubit<OnboardingState> {
     emit(state.copyWith(nativeCode: code));
   }
 
+  void selectTarget(String code) {
+    logger.d('[onboarding] target selected: $code');
+    emit(state.copyWith(targetCode: code));
+  }
+
   void setReminderTime(int hour, int minute) {
     logger.d('[onboarding] reminder time -> $hour:$minute');
     emit(state.copyWith(reminderHour: hour, reminderMinute: minute));
