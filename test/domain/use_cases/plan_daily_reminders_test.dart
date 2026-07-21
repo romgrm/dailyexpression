@@ -3,7 +3,7 @@ import 'package:daily_expression/domain/models/concept.dart';
 import 'package:daily_expression/domain/models/language_pair.dart';
 import 'package:daily_expression/domain/models/register.dart';
 import 'package:daily_expression/domain/time/clock.dart';
-import 'package:daily_expression/domain/use_cases/build_reminder_window.dart';
+import 'package:daily_expression/domain/use_cases/plan_daily_reminders.dart';
 import 'package:daily_expression/domain/use_cases/daily_selection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,12 +25,12 @@ List<Concept> _pool(int n) =>
 
 const _pair = LanguagePair(native: 'fr', target: 'en');
 
-BuildReminderWindow _build(Clock clock) =>
-    BuildReminderWindow(clock: clock, userSeed: 'seed-A');
+PlanDailyReminders _build(Clock clock) =>
+    PlanDailyReminders(clock: clock, userSeed: 'seed-A');
 
 void main() {
-  group('BuildReminderWindow', () {
-    test('returns exactly [count] daily slots on consecutive days', () {
+  group('PlanDailyReminders', () {
+    test('returns exactly [days] daily reminders on consecutive days', () {
       final clock = FakeClock(DateTime(2026, 7, 17, 6));
       final slots = _build(clock)(
         pair: _pair,
@@ -38,7 +38,7 @@ void main() {
         history: const [],
         reminderHour: 8,
         reminderMinute: 0,
-        count: 14,
+        days: 14,
       );
 
       expect(slots.length, 14);
@@ -62,7 +62,7 @@ void main() {
         history: const [],
         reminderHour: 8,
         reminderMinute: 0,
-        count: 3,
+        days: 3,
       );
       expect(slots.first.scheduledAt, DateTime(2026, 7, 17, 8, 0));
     });
@@ -75,7 +75,7 @@ void main() {
         history: const [],
         reminderHour: 8,
         reminderMinute: 0,
-        count: 3,
+        days: 3,
       );
       expect(slots.first.scheduledAt, DateTime(2026, 7, 18, 8, 0));
     });
@@ -89,7 +89,7 @@ void main() {
         history: const [],
         reminderHour: 8,
         reminderMinute: 0,
-        count: 14,
+        days: 14,
       );
 
       for (final slot in slots) {
@@ -123,7 +123,7 @@ void main() {
           history: const [],
           reminderHour: 8,
           reminderMinute: 0,
-          count: 0,
+          days: 0,
         ),
         isEmpty,
       );

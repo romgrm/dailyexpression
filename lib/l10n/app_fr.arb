@@ -2,6 +2,8 @@
   "@@locale": "fr",
   "appTitle": "Daily Expression",
   "appTagline": "Une expression, chaque jour",
+  "notificationDailyTitle": "Ton expression du jour",
+  "notificationDailyBody": "Aujourd'hui : {idiom}",
   "onboardingLanguageTitle": "Quelle est ta langue ?",
   "onboardingLanguageSubtitle": "Choisis la langue depuis laquelle tu apprends.",
   "onboardingComingSoon": "BIENTÔT",

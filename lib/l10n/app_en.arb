@@ -2,6 +2,11 @@
   "@@locale": "en",
   "appTitle": "Daily Expression",
   "appTagline": "One expression, every day",
+  "notificationDailyTitle": "Today's expression",
+  "notificationDailyBody": "Today: {idiom}",
+  "@notificationDailyBody": {
+    "placeholders": { "idiom": { "type": "String" } }
+  },
   "onboardingLanguageTitle": "What's your language?",
   "onboardingLanguageSubtitle": "Choose the language you're learning from.",
   "onboardingComingSoon": "SOON",
