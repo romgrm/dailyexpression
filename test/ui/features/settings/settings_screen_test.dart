@@ -1,6 +1,4 @@
-import 'package:daily_expression/data/repositories/corpus_repository.dart';
 import 'package:daily_expression/data/repositories/settings_repository.dart';
-import 'package:daily_expression/data/sources/corpus_local_data_source.dart';
 import 'package:daily_expression/domain/models/app_theme_mode.dart';
 import 'package:daily_expression/l10n/generated/app_localizations.dart';
 import 'package:daily_expression/ui/core/settings/settings_cubit.dart';
@@ -10,19 +8,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../support/corpus_mock.dart';
+
 void main() {
   testWidgets('renders preferences and switches theme to Dark', (tester) async {
     SharedPreferences.setMockInitialValues({'native_language': 'fr'});
     final prefs = await SharedPreferences.getInstance();
     final settingsRepo = SettingsRepository(prefs);
     final cubit = SettingsCubit(settingsRepo, settingsRepo.read());
+    final corpus = buildMockCorpusRepository();
 
     await tester.pumpWidget(
       MultiRepositoryProvider(
         providers: [
-          RepositoryProvider.value(
-            value: CorpusRepository(CorpusLocalDataSource()),
-          ),
+          RepositoryProvider.value(value: corpus),
         ],
         child: BlocProvider.value(
           value: cubit,

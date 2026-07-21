@@ -36,13 +36,22 @@ final class DailyCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Row(
+            child: Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.xs,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Pill(
                   label: expression.categoryLabel.toUpperCase(),
                   icon: _categoryIcon(expression.category),
                 ),
-                const Sizer.s(),
+                if (expression.variantLabel != null)
+                  Pill(
+                    label: expression.variantLabel!.toUpperCase(),
+                    icon: Icons.place_outlined,
+                    backgroundColor: scheme.surfaceContainerHighest,
+                    foregroundColor: scheme.onSurfaceVariant,
+                  ),
                 _CefrBadge(level: expression.level.label),
               ],
             ),
@@ -70,16 +79,20 @@ final class DailyCard extends StatelessWidget {
                 const Sizer.l(),
                 _EquivalentBlock(
                   languageName: nativeLanguageName,
-                  equivalent: expression.nativeEquivalent,
+                  equivalent: expression.nativeEquivalentOrPlaceholder,
+                  isPlaceholder: !expression.hasNativeEquivalent,
                 ),
                 if (expression.isNonEquivalent) ...[
                   const Sizer.s(),
                   _NonEquivalenceCallout(note: expression.nonEquivalenceNote!),
                 ],
                 const Sizer.l(),
-                _ContextBlock(
-                  example: expression.example,
-                  translation: expression.exampleTranslation,
+                SizedBox(
+                  width: double.infinity,
+                  child: _ContextBlock(
+                    example: expression.example,
+                    translation: expression.exampleTranslation,
+                  ),
                 ),
               ],
             ),
@@ -134,10 +147,15 @@ final class _CefrBadge extends StatelessWidget {
 
 /// The teal-tinted "equivalent in <language>" block with a leading accent bar.
 final class _EquivalentBlock extends StatelessWidget {
-  const _EquivalentBlock({required this.languageName, required this.equivalent});
+  const _EquivalentBlock({
+    required this.languageName,
+    required this.equivalent,
+    this.isPlaceholder = false,
+  });
 
   final String languageName;
   final String equivalent;
+  final bool isPlaceholder;
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +179,14 @@ final class _EquivalentBlock extends StatelessWidget {
                   children: [
                     Overline(l10n.dailyEquivalentIn(languageName)),
                     const Sizer.xs(),
-                    Text(equivalent, style: theme.textTheme.titleLarge),
+                    Text(
+                      equivalent,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontStyle:
+                            isPlaceholder ? FontStyle.italic : FontStyle.normal,
+                        color: isPlaceholder ? scheme.onSurfaceVariant : null,
+                      ),
+                    ),
                   ],
                 ),
               ),

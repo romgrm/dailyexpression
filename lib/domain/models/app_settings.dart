@@ -5,6 +5,7 @@ import 'app_theme_mode.dart';
 class AppSettings {
   const AppSettings({
     this.nativeLanguage,
+    this.targetLanguage,
     this.appLanguage,
     this.reminderHour = 8,
     this.reminderMinute = 0,
@@ -17,6 +18,9 @@ class AppSettings {
   /// on the free tier (changing/adding pairs is a premium feature).
   final String? nativeLanguage;
 
+  /// The language being learned (target of the corpus pair); null until chosen.
+  final String? targetLanguage;
+
   /// The app UI (wording) language code; null until onboarding. Free users can
   /// switch it between their source and target languages, independently of the
   /// corpus pair.
@@ -28,6 +32,7 @@ class AppSettings {
 
   AppSettings copyWith({
     String? nativeLanguage,
+    String? targetLanguage,
     String? appLanguage,
     int? reminderHour,
     int? reminderMinute,
@@ -36,6 +41,7 @@ class AppSettings {
   }) {
     return AppSettings(
       nativeLanguage: nativeLanguage ?? this.nativeLanguage,
+      targetLanguage: targetLanguage ?? this.targetLanguage,
       appLanguage: appLanguage ?? this.appLanguage,
       reminderHour: reminderHour ?? this.reminderHour,
       reminderMinute: reminderMinute ?? this.reminderMinute,
@@ -49,6 +55,7 @@ class AppSettings {
       identical(this, other) ||
       other is AppSettings &&
           other.nativeLanguage == nativeLanguage &&
+          other.targetLanguage == targetLanguage &&
           other.appLanguage == appLanguage &&
           other.reminderHour == reminderHour &&
           other.reminderMinute == reminderMinute &&
@@ -58,6 +65,7 @@ class AppSettings {
   @override
   int get hashCode => Object.hash(
         nativeLanguage,
+        targetLanguage,
         appLanguage,
         reminderHour,
         reminderMinute,

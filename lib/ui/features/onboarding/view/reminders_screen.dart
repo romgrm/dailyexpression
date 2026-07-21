@@ -22,15 +22,18 @@ final class RemindersScreen extends StatelessWidget {
 
     Future<void> complete() async {
       final native = onboarding.nativeCode;
-      if (native == null) return;
+      final target = onboarding.targetCode;
+      if (native == null || target == null) return;
       await context.read<SettingsCubit>().completeOnboarding(
             nativeLanguage: native,
+            targetLanguage: target,
             reminderHour: onboarding.reminderHour,
             reminderMinute: onboarding.reminderMinute,
           );
     }
 
     return AppScaffold(
+      showBack: true,
       bottomAction: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

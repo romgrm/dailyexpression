@@ -97,10 +97,28 @@ class CorpusRepository {
             ))
         .toList();
 
+    final noEquivalent = <String, String>{};
+    final noEquivJson = (config['ui_strings'] as Map<String, dynamic>?)?[
+        'no_equivalent'] as Map<String, dynamic>?;
+    if (noEquivJson != null) {
+      for (final entry in noEquivJson.entries) {
+        noEquivalent[entry.key] = entry.value as String;
+      }
+    }
+
+    final variants = <String, Map<String, String>>{};
+    final variantsJson = config['variants'] as Map<String, dynamic>? ?? const {};
+    for (final entry in variantsJson.entries) {
+      variants[entry.key] = (entry.value as Map<String, dynamic>)
+          .map((key, value) => MapEntry(key, value as String));
+    }
+
     return CorpusConfig(
       languages: languages,
       activePairs: activePairs,
       categories: categories,
+      noEquivalent: noEquivalent,
+      variants: variants,
     );
   }
 
@@ -115,6 +133,7 @@ class CorpusRepository {
         ExpressionForm(
           text: form['text'] as String,
           example: form['example'] as String,
+          variant: form['variant'] as String?,
         ),
       );
     });

@@ -28,10 +28,11 @@ class Concept {
   final Map<String, Gloss> glosses;
   final List<String> tags;
 
-  /// Whether this concept can be shown for [pair]: it must carry both language
-  /// forms, the couple's gloss, and the meaning in the native language.
+  /// Whether this concept can be shown for [pair] (schema v2): it must carry the
+  /// target form, the couple's gloss, and the meaning in the native language.
+  /// The native form is OPTIONAL — when absent the UI shows a "no equivalent"
+  /// placeholder instead of the native equivalent.
   bool isAvailableFor(LanguagePair pair) =>
-      forms.containsKey(pair.native) &&
       forms.containsKey(pair.target) &&
       glosses.containsKey(pair.glossKey) &&
       meaning.containsKey(pair.native);

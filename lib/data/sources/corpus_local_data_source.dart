@@ -10,7 +10,7 @@ class CorpusLocalDataSource {
 
   final AssetBundle _bundle;
 
-  static const _assetPath = 'assets/corpus/corpus.json';
+  static const _assetPath = 'assets/corpus/corpus_v2.json';
 
   Future<Map<String, dynamic>> loadRaw() async {
     final jsonString = await _bundle.loadString(_assetPath);

@@ -1,0 +1,4347 @@
+{
+  "_schema": {
+    "version": "2.1",
+    "principle": "Pure pivot data: each concept carries its natural forms in every language, with no language privileged. The product only exposes the couples listed in config.active_pairs. Glosses (the word-for-word image) are stored per couple for active pairs; others will be generated on demand and cached.",
+    "language_rule": "Machine-facing and developer-facing strings are in English (schema docs, category/register codes, tags, editorial notes). User-facing content stays in its own language (forms, meaning, gloss literals and example translations, display names).",
+    "concept_fields": {
+      "id": "stable identifier, snake_case",
+      "category": "theme code in English (maps to a localized label via config.categories). Drives daily selection and premium theme filtering.",
+      "level": "approximate CEFR level of the TARGET expression (A1..C2). Indicative.",
+      "register": "neutral | informal | formal",
+      "meaning": "short definition of the concept, localized per language (shown to the user in their native language)",
+      "forms": "one entry per language in which the concept has an ESTABLISHED expression. A language MAY be absent: absence means no real equivalent exists in that language (never invent one). Each form: {text, example, variant?}. 'variant' is an optional regional code from config.variants (e.g. 'fr-CA'); absent/null = pan-regional.",
+      "glosses": "object keyed by couple, key = '{target}_{native}'. Holds the word-for-word image of the target expression rendered in the native language, plus a translation of the example, plus an optional note.",
+      "tags": "free-form English keywords"
+    },
+    "gloss_fields": {
+      "literal": "the TARGET expression rendered word-for-word in the NATIVE language (conveys the imagery)",
+      "example_translation": "natural translation of the target example into the native language",
+      "note": "optional, USER-FACING: flags a non-equivalence or adds cultural colour. Written in the NATIVE language of the couple (fr for en_fr, en for fr_en). null when there is nothing to flag. STRONGLY RECOMMENDED for concepts with no native-language form: explain the gap, it is the most interesting part of the card."
+    },
+    "availability_rule": "a concept is available for pair {native, target} iff: forms[target] exists AND glosses['{target}_{native}'] exists AND meaning[native] exists. forms[native] is OPTIONAL: when absent, the UI shows config.ui_strings.no_equivalent[native] in place of the native equivalent.",
+    "daily_card_render": "For the couple (native=fr, target=en): show forms.en.text (the idiom to learn), glosses.en_fr.literal (its image in French), forms.fr.text (the natural French equivalent), forms.en.example (the English example) and glosses.en_fr.example_translation (its translation).",
+    "config_fields": {
+      "ui_strings.no_equivalent": "localized placeholder shown when a concept has no expression in the user's native language; keyed and written in that language",
+      "variants": "regional variant codes usable in forms[lang].variant, with localized badge labels per UI language"
+    }
+  },
+  "config": {
+    "languages": {
+      "en": {
+        "name_native": "English",
+        "display": {
+          "fr": "Anglais",
+          "es": "Inglés"
+        },
+        "flag": "🇬🇧"
+      },
+      "fr": {
+        "name_native": "Français",
+        "display": {
+          "en": "French",
+          "es": "Francés"
+        },
+        "flag": "🇫🇷"
+      },
+      "es": {
+        "name_native": "Español",
+        "display": {
+          "en": "Spanish",
+          "fr": "Espagnol"
+        },
+        "flag": "🇪🇸"
+      },
+      "de": {
+        "name_native": "Deutsch",
+        "display": {
+          "en": "German",
+          "fr": "Allemand",
+          "es": "Alemán"
+        },
+        "flag": "🇩🇪"
+      }
+    },
+    "categories": {
+      "weather": {
+        "en": "Weather",
+        "fr": "Météo",
+        "es": "Clima"
+      },
+      "money": {
+        "en": "Money",
+        "fr": "Argent",
+        "es": "Dinero"
+      },
+      "time": {
+        "en": "Time",
+        "fr": "Temps",
+        "es": "Tiempo"
+      },
+      "suspicion": {
+        "en": "Suspicion",
+        "fr": "Soupçon",
+        "es": "Sospecha"
+      },
+      "emotions": {
+        "en": "Emotions",
+        "fr": "Émotions",
+        "es": "Emociones"
+      },
+      "priorities": {
+        "en": "Priorities",
+        "fr": "Priorités",
+        "es": "Prioridades"
+      },
+      "everyday": {
+        "en": "Everyday",
+        "fr": "Quotidien",
+        "es": "Cotidiano"
+      },
+      "food": {
+        "en": "Food",
+        "fr": "Nourriture",
+        "es": "Comida"
+      },
+      "character": {
+        "en": "Character",
+        "fr": "Caractère",
+        "es": "Carácter"
+      },
+      "work": {
+        "en": "Work",
+        "fr": "Travail",
+        "es": "Trabajo"
+      },
+      "communication": {
+        "en": "Communication",
+        "fr": "Communication",
+        "es": "Comunicación"
+      },
+      "luck": {
+        "en": "Luck",
+        "fr": "Chance",
+        "es": "Suerte"
+      },
+      "love": {
+        "en": "Love",
+        "fr": "Amour",
+        "es": "Amor"
+      },
+      "appearance": {
+        "en": "Appearance",
+        "fr": "Apparence",
+        "es": "Apariencia"
+      },
+      "trouble": {
+        "en": "Trouble",
+        "fr": "Ennuis",
+        "es": "Apuros"
+      },
+      "wisdom": {
+        "en": "Wisdom",
+        "fr": "Sagesse",
+        "es": "Sabiduría"
+      }
+    },
+    "active_pairs": [
+      {
+        "native": "fr",
+        "target": "en"
+      },
+      {
+        "native": "en",
+        "target": "fr"
+      }
+    ],
+    "_note_config": "The native-language picker makes selectable any language present as 'native' in active_pairs (here fr, es). Others (en, de) appear greyed out -> waitlist. Adding a couple = one line here, no code change.",
+    "ui_strings": {
+      "no_equivalent": {
+        "en": "No direct English equivalent",
+        "fr": "Pas d'équivalent direct en français",
+        "es": "Sin equivalente directo en español"
+      }
+    },
+    "variants": {
+      "fr-CA": {
+        "en": "Quebec French",
+        "fr": "Québécois",
+        "es": "Francés quebequés"
+      },
+      "fr-FR": {
+        "en": "France French",
+        "fr": "Français de France",
+        "es": "Francés de Francia"
+      },
+      "en-US": {
+        "en": "American English",
+        "fr": "Anglais américain",
+        "es": "Inglés americano"
+      },
+      "en-GB": {
+        "en": "British English",
+        "fr": "Anglais britannique",
+        "es": "Inglés británico"
+      }
+    }
+  },
+  "concepts": [
+    {
+      "id": "rain_heavy",
+      "category": "weather",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Pleuvoir très fort.",
+        "es": "Llover muchísimo.",
+        "en": "To rain very heavily."
+      },
+      "forms": {
+        "en": {
+          "text": "It's raining cats and dogs.",
+          "example": "We're staying in tonight, it's raining cats and dogs."
+        },
+        "fr": {
+          "text": "Il pleut des cordes.",
+          "example": "On reste à la maison, il pleut des cordes."
+        },
+        "es": {
+          "text": "Llueve a cántaros.",
+          "example": "Nos quedamos en casa, llueve a cántaros."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Il pleut des chats et des chiens.",
+          "example_translation": "On reste à la maison ce soir, il pleut des cordes.",
+          "note": null
+        },
+        "en_es": {
+          "literal": "Llueve gatos y perros.",
+          "example_translation": "Esta noche nos quedamos en casa, llueve a cántaros.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "It's raining ropes.",
+          "example_translation": "We're staying home, it's raining cats and dogs.",
+          "note": null
+        }
+      },
+      "tags": [
+        "weather",
+        "idiom",
+        "animals"
+      ]
+    },
+    {
+      "id": "very_expensive",
+      "category": "money",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Coûter très cher.",
+        "es": "Costar muchísimo.",
+        "en": "To be very expensive."
+      },
+      "forms": {
+        "en": {
+          "text": "To cost an arm and a leg.",
+          "example": "That car cost me an arm and a leg."
+        },
+        "fr": {
+          "text": "Coûter les yeux de la tête.",
+          "example": "Cette voiture coûte les yeux de la tête."
+        },
+        "es": {
+          "text": "Costar un ojo de la cara.",
+          "example": "Ese coche cuesta un ojo de la cara."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Coûter un bras et une jambe.",
+          "example_translation": "Cette voiture m'a coûté les yeux de la tête.",
+          "note": null
+        },
+        "en_es": {
+          "literal": "Costar un brazo y una pierna.",
+          "example_translation": "Ese coche me costó un ojo de la cara.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To cost the eyes out of your head.",
+          "example_translation": "That car costs an arm and a leg.",
+          "note": null
+        }
+      },
+      "tags": [
+        "money",
+        "idiom",
+        "body"
+      ]
+    },
+    {
+      "id": "never_happen",
+      "category": "time",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Jamais ; à un moment qui n'arrivera pas.",
+        "es": "Nunca.",
+        "en": "Never; at a time that will never come."
+      },
+      "forms": {
+        "en": {
+          "text": "When pigs fly.",
+          "example": "He'll clean his room when pigs fly."
+        },
+        "fr": {
+          "text": "Quand les poules auront des dents.",
+          "example": "Il rangera sa chambre quand les poules auront des dents."
+        },
+        "es": {
+          "text": "Cuando las ranas críen pelo.",
+          "example": "Ordenará su cuarto cuando las ranas críen pelo."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Quand les cochons voleront.",
+          "example_translation": "Il rangera sa chambre quand les poules auront des dents.",
+          "note": null
+        },
+        "en_es": {
+          "literal": "Cuando los cerdos vuelen.",
+          "example_translation": "Ordenará su cuarto cuando las ranas críen pelo.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "When hens have teeth.",
+          "example_translation": "He'll clean his room when pigs fly.",
+          "note": null
+        }
+      },
+      "tags": [
+        "time",
+        "idiom",
+        "animals"
+      ]
+    },
+    {
+      "id": "something_fishy",
+      "category": "suspicion",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Quelque chose de louche, de caché.",
+        "es": "Algo sospechoso.",
+        "en": "Something seems suspicious."
+      },
+      "forms": {
+        "en": {
+          "text": "Something smells fishy.",
+          "example": "He's being too nice, something smells fishy."
+        },
+        "fr": {
+          "text": "Il y a anguille sous roche.",
+          "example": "Il sourit trop, il y a anguille sous roche."
+        },
+        "es": {
+          "text": "Hay gato encerrado.",
+          "example": "Aquí hay gato encerrado."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Quelque chose sent le poisson.",
+          "example_translation": "Il est trop gentil, il y a anguille sous roche.",
+          "note": null
+        },
+        "en_es": {
+          "literal": "Algo huele a pescado.",
+          "example_translation": "Está demasiado amable, aquí hay gato encerrado.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "There's an eel under the rock.",
+          "example_translation": "He smiles too much, something smells fishy.",
+          "note": null
+        }
+      },
+      "tags": [
+        "suspicion",
+        "idiom",
+        "animals"
+      ]
+    },
+    {
+      "id": "feeling_down",
+      "category": "emotions",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être triste, déprimé.",
+        "es": "Estar triste, decaído.",
+        "en": "To feel sad or low."
+      },
+      "forms": {
+        "en": {
+          "text": "To have the blues.",
+          "example": "I've had the blues since he left."
+        },
+        "fr": {
+          "text": "Avoir le cafard.",
+          "example": "Depuis qu'il est parti, j'ai le cafard."
+        },
+        "es": {
+          "text": "Estar de bajón.",
+          "example": "Estoy de bajón desde que se fue."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir 'le bleu' (le blues).",
+          "example_translation": "J'ai le cafard depuis qu'il est parti.",
+          "note": null
+        },
+        "en_es": {
+          "literal": "Tener 'los azules' (la melancolía).",
+          "example_translation": "Estoy de bajón desde que se fue.",
+          "note": "The English colour image has no colour-based equivalent in everyday Spanish; the natural equivalent is 'estar de bajon'."
+        },
+        "fr_en": {
+          "literal": "To have the cockroach.",
+          "example_translation": "I've had the blues since he left.",
+          "note": "The French image (a cockroach!) comes from Baudelaire's 'spleen'; the natural English equivalent is 'to have the blues'."
+        }
+      },
+      "tags": [
+        "emotions",
+        "idiom"
+      ]
+    },
+    {
+      "id": "other_fish_to_fry",
+      "category": "priorities",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir mieux à faire, des choses plus importantes.",
+        "es": "Tener cosas más importantes que hacer.",
+        "en": "To have more important things to do."
+      },
+      "forms": {
+        "en": {
+          "text": "To have other fish to fry.",
+          "example": "I can't deal with this, I have other fish to fry."
+        },
+        "fr": {
+          "text": "Avoir d'autres chats à fouetter.",
+          "example": "Je n'ai pas le temps, j'ai d'autres chats à fouetter."
+        },
+        "es": {
+          "text": "Tener cosas más importantes entre manos.",
+          "example": "Tengo cosas más importantes entre manos."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir d'autres poissons à frire.",
+          "example_translation": "Je ne peux pas gérer ça, j'ai d'autres chats à fouetter.",
+          "note": "Deux images différentes pour la même idée : des chats à fouetter en français, des poissons à frire en anglais."
+        },
+        "en_es": {
+          "literal": "Tener otros peces que freír.",
+          "example_translation": "No puedo con esto, tengo cosas más importantes entre manos.",
+          "note": "Everyday Spanish has no image-based equivalent idiom; render the meaning. Non-equivalence case to flag in the UI rather than inventing a fake idiom."
+        },
+        "fr_en": {
+          "literal": "To have other cats to whip.",
+          "example_translation": "I don't have time, I have other fish to fry.",
+          "note": "FR and EN each have an image-based idiom (cats to whip / fish to fry): good pedagogical and viral content."
+        }
+      },
+      "tags": [
+        "priorities",
+        "idiom",
+        "animals",
+        "non-equivalence"
+      ]
+    },
+    {
+      "id": "agreement_casual",
+      "category": "everyday",
+      "level": "A2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Marquer son accord de façon décontractée.",
+        "es": "Mostrar acuerdo informalmente.",
+        "en": "To express agreement casually."
+      },
+      "forms": {
+        "en": {
+          "text": "Works for me!",
+          "example": "See you at 6? Works for me!"
+        },
+        "fr": {
+          "text": "Ça marche !",
+          "example": "On se voit à 18h ? Ça marche !"
+        },
+        "es": {
+          "text": "¡Vale!",
+          "example": "¿Nos vemos a las seis? ¡Vale!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Ça marche pour moi !",
+          "example_translation": "On se voit à 18h ? Ça marche !",
+          "note": null
+        },
+        "en_es": {
+          "literal": "¡Me funciona!",
+          "example_translation": "¿Nos vemos a las seis? ¡Vale!",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "That walks!",
+          "example_translation": "See you at 6? Works for me!",
+          "note": "'Marcher' means both 'to walk' and 'to work/function'; the idiom plays on the second sense."
+        }
+      },
+      "tags": [
+        "everyday",
+        "interjection"
+      ]
+    },
+    {
+      "id": "frog_in_throat",
+      "category": "everyday",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Être enroué, avoir du mal à parler.",
+        "es": "Estar ronco.",
+        "en": "To be hoarse."
+      },
+      "forms": {
+        "en": {
+          "text": "To have a frog in one's throat.",
+          "example": "Sorry, I've got a frog in my throat."
+        },
+        "fr": {
+          "text": "Avoir un chat dans la gorge.",
+          "example": "Excuse-moi, j'ai un chat dans la gorge."
+        },
+        "es": {
+          "text": "Tener carraspera.",
+          "example": "Perdona, tengo carraspera."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir une grenouille dans la gorge.",
+          "example_translation": "Excuse-moi, j'ai un chat dans la gorge.",
+          "note": "Même idée, autre animal : la grenouille en anglais, le chat en français."
+        },
+        "en_es": {
+          "literal": "Tener una rana en la garganta.",
+          "example_translation": "Perdona, tengo carraspera.",
+          "note": "Spanish uses no animal; neutral equivalent 'tener carraspera'."
+        },
+        "fr_en": {
+          "literal": "To have a cat in your throat.",
+          "example_translation": "Sorry, I've got a frog in my throat.",
+          "note": "Same idea, different animal: cat (FR) vs frog (EN). Excellent viral content."
+        }
+      },
+      "tags": [
+        "everyday",
+        "idiom",
+        "animals",
+        "non-equivalence"
+      ]
+    },
+    {
+      "id": "stand_someone_up",
+      "category": "love",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Ne pas venir à un rendez-vous sans prévenir.",
+        "en": "To fail to show up for a date or an appointment."
+      },
+      "forms": {
+        "fr": {
+          "text": "Poser un lapin à quelqu'un.",
+          "example": "Elle m'a posé un lapin hier soir."
+        },
+        "en": {
+          "text": "To stand someone up.",
+          "example": "She stood me up last night."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Laisser quelqu'un debout.",
+          "example_translation": "Elle m'a posé un lapin hier soir.",
+          "note": "Pas d'image animale en anglais : on « laisse quelqu'un debout », tout simplement."
+        },
+        "fr_en": {
+          "literal": "To put a rabbit on someone.",
+          "example_translation": "She stood me up last night.",
+          "note": "No rabbit in English — you simply leave someone standing there."
+        }
+      },
+      "tags": [
+        "idiom",
+        "love"
+      ]
+    },
+    {
+      "id": "goosebumps",
+      "category": "emotions",
+      "level": "A2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir de petits frissons sur la peau (froid, peur, émotion).",
+        "en": "To get small bumps on the skin from cold, fear or emotion."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir la chair de poule.",
+          "example": "Ce film m'a donné la chair de poule."
+        },
+        "en": {
+          "text": "To get goosebumps.",
+          "example": "That movie gave me goosebumps."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir des bosses d'oie.",
+          "example_translation": "Ce film m'a donné la chair de poule.",
+          "note": "Même image, autre volatile : l'oie en anglais, la poule en français."
+        },
+        "fr_en": {
+          "literal": "To have hen flesh.",
+          "example_translation": "That movie gave me goosebumps.",
+          "note": "Same image, different bird: a hen in French, a goose in English."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "pass_out",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "S'évanouir.",
+        "en": "To faint."
+      },
+      "forms": {
+        "fr": {
+          "text": "Tomber dans les pommes.",
+          "example": "Il faisait si chaud qu'elle est tombée dans les pommes."
+        },
+        "en": {
+          "text": "To pass out.",
+          "example": "It was so hot that she passed out."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Passer au-dehors (s'éteindre).",
+          "example_translation": "Il faisait si chaud qu'elle est tombée dans les pommes.",
+          "note": "Pas d'image en anglais courant ; « to pass out » est neutre."
+        },
+        "fr_en": {
+          "literal": "To fall in the apples.",
+          "example_translation": "It was so hot that she passed out.",
+          "note": "English has no fruit here; 'to pass out' is the plain equivalent. Why apples? Even the French aren't sure."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "head_in_clouds",
+      "category": "character",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Être distrait, rêveur.",
+        "en": "To be dreamy and absent-minded."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être dans la lune.",
+          "example": "Tu ne m'écoutes pas, tu es encore dans la lune !"
+        },
+        "en": {
+          "text": "To have one's head in the clouds.",
+          "example": "You're not listening, you've got your head in the clouds again!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir la tête dans les nuages.",
+          "example_translation": "Tu ne m'écoutes pas, tu es encore dans la lune !",
+          "note": "Le français dit aussi « avoir la tête dans les nuages » — deux images célestes."
+        },
+        "fr_en": {
+          "literal": "To be in the moon.",
+          "example_translation": "You're not listening, you've got your head in the clouds again!",
+          "note": "French also says 'avoir la tête dans les nuages' (head in the clouds), but the moon is the classic."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "love_at_first_sight",
+      "category": "love",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Tomber amoureux immédiatement.",
+        "en": "To fall in love instantly."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir un coup de foudre.",
+          "example": "Quand je l'ai vue, ça a été le coup de foudre."
+        },
+        "en": {
+          "text": "Love at first sight.",
+          "example": "When I saw her, it was love at first sight."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "L'amour au premier regard.",
+          "example_translation": "Quand je l'ai vue, ça a été le coup de foudre.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "A strike of lightning.",
+          "example_translation": "When I saw her, it was love at first sight.",
+          "note": "In French, falling in love is literally being struck by lightning."
+        }
+      },
+      "tags": [
+        "idiom",
+        "love"
+      ]
+    },
+    {
+      "id": "bone_idle",
+      "category": "character",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être extrêmement paresseux.",
+        "en": "To be extremely lazy."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir un poil dans la main.",
+          "example": "Il ne fait jamais la vaisselle, il a un poil dans la main."
+        },
+        "en": {
+          "text": "To be bone idle.",
+          "example": "He never does the dishes, he's bone idle."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Oisif jusqu'à l'os.",
+          "example_translation": "Il ne fait jamais la vaisselle, il a un poil dans la main.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have a hair in one's hand.",
+          "example_translation": "He never does the dishes, he's bone idle.",
+          "note": "The idea: so lazy that a hair has had time to grow in your palm."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "two_cents",
+      "category": "communication",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Donner son avis sans qu'on le demande.",
+        "en": "To offer one's opinion uninvited."
+      },
+      "forms": {
+        "fr": {
+          "text": "Mettre son grain de sel.",
+          "example": "Il faut toujours qu'il mette son grain de sel !"
+        },
+        "en": {
+          "text": "To put in one's two cents.",
+          "example": "He always has to put in his two cents!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Mettre ses deux centimes.",
+          "example_translation": "Il faut toujours qu'il mette son grain de sel !",
+          "note": "Sel côté français, monnaie côté anglais."
+        },
+        "fr_en": {
+          "literal": "To add one's grain of salt.",
+          "example_translation": "He always has to put in his two cents!",
+          "note": "Salt in French, money in English."
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "call_spade_spade",
+      "category": "communication",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Dire les choses franchement, sans détour.",
+        "en": "To speak plainly and directly."
+      },
+      "forms": {
+        "fr": {
+          "text": "Appeler un chat un chat.",
+          "example": "Il faut être honnête et appeler un chat un chat."
+        },
+        "en": {
+          "text": "To call a spade a spade.",
+          "example": "Let's be honest and call a spade a spade."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Appeler une pelle une pelle.",
+          "example_translation": "Il faut être honnête et appeler un chat un chat.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To call a cat a cat.",
+          "example_translation": "Let's be honest and call a spade a spade.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "speak_of_devil",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Se dit quand une personne arrive au moment où l'on parlait d'elle.",
+        "en": "Said when someone shows up just as you were talking about them."
+      },
+      "forms": {
+        "fr": {
+          "text": "Quand on parle du loup...",
+          "example": "Quand on parle du loup ! On parlait justement de toi."
+        },
+        "en": {
+          "text": "Speak of the devil!",
+          "example": "Speak of the devil! We were just talking about you."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Parlez du diable.",
+          "example_translation": "Quand on parle du loup ! On parlait justement de toi.",
+          "note": "Le diable anglais, le loup français ; la version complète ajoute « ...on en voit la queue »."
+        },
+        "fr_en": {
+          "literal": "When you speak of the wolf...",
+          "example_translation": "Speak of the devil! We were just talking about you.",
+          "note": "A wolf in French, the devil in English; the full French version adds '...and you'll see its tail'."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "count_chickens",
+      "category": "wisdom",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Ne pas se réjouir avant que la chose soit acquise.",
+        "en": "Don't celebrate before it's certain."
+      },
+      "forms": {
+        "fr": {
+          "text": "Il ne faut pas vendre la peau de l'ours avant de l'avoir tué.",
+          "example": "Attends la signature : il ne faut pas vendre la peau de l'ours avant de l'avoir tué."
+        },
+        "en": {
+          "text": "Don't count your chickens before they hatch.",
+          "example": "Wait for the signature — don't count your chickens before they hatch."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Ne comptez pas vos poulets avant l'éclosion.",
+          "example_translation": "Attends la signature : il ne faut pas vendre la peau de l'ours avant de l'avoir tué.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "Don't sell the bear's skin before you've killed it.",
+          "example_translation": "Wait for the signature — don't count your chickens before they hatch.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "wisdom"
+      ]
+    },
+    {
+      "id": "cake_and_eat_it",
+      "category": "priorities",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Vouloir deux avantages incompatibles.",
+        "en": "To want two incompatible advantages."
+      },
+      "forms": {
+        "fr": {
+          "text": "Vouloir le beurre et l'argent du beurre.",
+          "example": "Tu ne peux pas tout avoir : c'est vouloir le beurre et l'argent du beurre."
+        },
+        "en": {
+          "text": "To have your cake and eat it too.",
+          "example": "You can't have it all — you can't have your cake and eat it too."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir son gâteau et le manger aussi.",
+          "example_translation": "Tu ne peux pas tout avoir : c'est vouloir le beurre et l'argent du beurre.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To want the butter and the butter's money.",
+          "example_translation": "You can't have it all — you can't have your cake and eat it too.",
+          "note": "The cheeky full French version adds '...and the dairymaid's smile'."
+        }
+      },
+      "tags": [
+        "idiom",
+        "priorities"
+      ]
+    },
+    {
+      "id": "split_hairs",
+      "category": "communication",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Faire des distinctions inutilement subtiles.",
+        "en": "To make needlessly fine distinctions."
+      },
+      "forms": {
+        "fr": {
+          "text": "Couper les cheveux en quatre.",
+          "example": "Arrête de couper les cheveux en quatre et décide-toi !"
+        },
+        "en": {
+          "text": "To split hairs.",
+          "example": "Stop splitting hairs and make up your mind!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Fendre les cheveux.",
+          "example_translation": "Arrête de couper les cheveux en quatre et décide-toi !",
+          "note": "Même image : l'anglais fend le cheveu, le français le coupe en quatre."
+        },
+        "fr_en": {
+          "literal": "To cut hairs in four.",
+          "example_translation": "Stop splitting hairs and make up your mind!",
+          "note": "Same image: English splits the hair, French cuts it in four."
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "fight_cats_dogs",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Se disputer sans arrêt.",
+        "en": "To argue constantly."
+      },
+      "forms": {
+        "fr": {
+          "text": "S'entendre comme chien et chat.",
+          "example": "Mon frère et ma sœur s'entendent comme chien et chat."
+        },
+        "en": {
+          "text": "To fight like cats and dogs.",
+          "example": "My brother and sister fight like cats and dogs."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Se battre comme chats et chiens.",
+          "example_translation": "Mon frère et ma sœur s'entendent comme chien et chat.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To get along like dog and cat.",
+          "example_translation": "My brother and sister fight like cats and dogs.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "sleep_like_log",
+      "category": "everyday",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Dormir très profondément.",
+        "en": "To sleep very deeply."
+      },
+      "forms": {
+        "fr": {
+          "text": "Dormir comme un loir.",
+          "example": "Après la randonnée, j'ai dormi comme un loir."
+        },
+        "en": {
+          "text": "To sleep like a log.",
+          "example": "After the hike, I slept like a log."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Dormir comme une bûche.",
+          "example_translation": "Après la randonnée, j'ai dormi comme un loir.",
+          "note": "L'anglais dort comme une bûche, le français comme un petit rongeur qui hiberne."
+        },
+        "fr_en": {
+          "literal": "To sleep like a dormouse.",
+          "example_translation": "After the hike, I slept like a log.",
+          "note": "A dormouse is a tiny hibernating rodent — France's champion sleeper."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "elephant_memory",
+      "category": "character",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Se souvenir de tout, très longtemps.",
+        "en": "To remember everything, for a very long time."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir une mémoire d'éléphant.",
+          "example": "Elle se souvient de tout, elle a une mémoire d'éléphant."
+        },
+        "en": {
+          "text": "To have a memory like an elephant.",
+          "example": "She remembers everything, she has a memory like an elephant."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir une mémoire comme un éléphant.",
+          "example_translation": "Elle se souvient de tout, elle a une mémoire d'éléphant.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have an elephant's memory.",
+          "example_translation": "She remembers everything, she has a memory like an elephant.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "blind_as_bat",
+      "category": "character",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Très mal voir.",
+        "en": "To have very poor eyesight."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être myope comme une taupe.",
+          "example": "Sans ses lunettes, il est myope comme une taupe."
+        },
+        "en": {
+          "text": "To be as blind as a bat.",
+          "example": "Without his glasses, he's as blind as a bat."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Aveugle comme une chauve-souris.",
+          "example_translation": "Sans ses lunettes, il est myope comme une taupe.",
+          "note": "Chauve-souris anglaise contre taupe française : deux bêtes qui vivent dans le noir."
+        },
+        "fr_en": {
+          "literal": "Short-sighted as a mole.",
+          "example_translation": "Without his glasses, he's as blind as a bat.",
+          "note": "An English bat versus a French mole: two creatures of the dark."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "stubborn_mule",
+      "category": "character",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Refuser obstinément de changer d'avis.",
+        "en": "To stubbornly refuse to change one's mind."
+      },
+      "forms": {
+        "fr": {
+          "text": "Têtu comme une mule.",
+          "example": "Il ne changera pas d'avis, il est têtu comme une mule."
+        },
+        "en": {
+          "text": "As stubborn as a mule.",
+          "example": "He won't change his mind, he's as stubborn as a mule."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Têtu comme une mule.",
+          "example_translation": "Il ne changera pas d'avis, il est têtu comme une mule.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "Stubborn as a mule.",
+          "example_translation": "He won't change his mind, he's as stubborn as a mule.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "throw_in_towel",
+      "category": "work",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Abandonner, renoncer.",
+        "en": "To give up."
+      },
+      "forms": {
+        "fr": {
+          "text": "Jeter l'éponge.",
+          "example": "Après trois échecs, il a jeté l'éponge."
+        },
+        "en": {
+          "text": "To throw in the towel.",
+          "example": "After three failures, he threw in the towel."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Jeter la serviette.",
+          "example_translation": "Après trois échecs, il a jeté l'éponge.",
+          "note": "Deux images venues de la boxe : serviette anglaise, éponge française."
+        },
+        "fr_en": {
+          "literal": "To throw in the sponge.",
+          "example_translation": "After three failures, he threw in the towel.",
+          "note": "Both come from the boxing corner: a towel in English, a sponge in French."
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "beat_around_bush",
+      "category": "communication",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Éviter d'aborder directement un sujet.",
+        "en": "To avoid getting to the point."
+      },
+      "forms": {
+        "fr": {
+          "text": "Tourner autour du pot.",
+          "example": "Dis-le franchement, arrête de tourner autour du pot."
+        },
+        "en": {
+          "text": "To beat around the bush.",
+          "example": "Say it plainly, stop beating around the bush."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Battre autour du buisson.",
+          "example_translation": "Dis-le franchement, arrête de tourner autour du pot.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To circle around the pot.",
+          "example_translation": "Say it plainly, stop beating around the bush.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "foot_in_mouth",
+      "category": "communication",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Faire une gaffe, aborder maladroitement un sujet délicat.",
+        "en": "To make an embarrassing blunder."
+      },
+      "forms": {
+        "fr": {
+          "text": "Mettre les pieds dans le plat.",
+          "example": "Il a mis les pieds dans le plat en parlant de son ex."
+        },
+        "en": {
+          "text": "To put one's foot in one's mouth.",
+          "example": "He put his foot in his mouth by mentioning her ex."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Mettre son pied dans sa bouche.",
+          "example_translation": "Il a mis les pieds dans le plat en parlant de son ex.",
+          "note": "Nuance : le français vise surtout le sujet gênant abordé sans tact, l'anglais la parole malheureuse."
+        },
+        "fr_en": {
+          "literal": "To put one's feet in the dish.",
+          "example_translation": "He put his foot in his mouth by mentioning her ex.",
+          "note": "Nuance: the French version is more about bluntly raising an awkward subject than misspeaking."
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "shirt_off_back",
+      "category": "character",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Être très généreux.",
+        "en": "To be extremely generous."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir le cœur sur la main.",
+          "example": "Elle aide tout le monde, elle a le cœur sur la main."
+        },
+        "en": {
+          "text": "To give the shirt off one's back.",
+          "example": "She helps everyone — she'd give you the shirt off her back."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Donner la chemise qu'on a sur le dos.",
+          "example_translation": "Elle aide tout le monde, elle a le cœur sur la main.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have one's heart on one's hand.",
+          "example_translation": "She helps everyone — she'd give you the shirt off her back.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "on_ones_nerves",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Agacer fortement quelqu'un.",
+        "en": "To annoy someone intensely."
+      },
+      "forms": {
+        "fr": {
+          "text": "Casser les pieds à quelqu'un.",
+          "example": "Arrête avec cette chanson, tu me casses les pieds !"
+        },
+        "en": {
+          "text": "To get on someone's nerves.",
+          "example": "Stop it with that song, you're getting on my nerves!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Monter sur les nerfs de quelqu'un.",
+          "example_translation": "Arrête avec cette chanson, tu me casses les pieds !",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To break someone's feet.",
+          "example_translation": "Stop it with that song, you're getting on my nerves!",
+          "note": "Why feet? Probably a polite stand-in for a ruder body part."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "sleep_in",
+      "category": "everyday",
+      "level": "A2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Rester au lit tard le matin.",
+        "en": "To stay in bed late in the morning."
+      },
+      "forms": {
+        "fr": {
+          "text": "Faire la grasse matinée.",
+          "example": "Le dimanche, je fais la grasse matinée."
+        },
+        "en": {
+          "text": "To sleep in.",
+          "example": "On Sundays, I sleep in."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Dormir dedans.",
+          "example_translation": "Le dimanche, je fais la grasse matinée.",
+          "note": "Pas d'image en anglais : « dormir dedans », c'est tout."
+        },
+        "fr_en": {
+          "literal": "To have a fat morning.",
+          "example_translation": "On Sundays, I sleep in.",
+          "note": "The French literally enjoy a 'fat morning' — English keeps it plain."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "lot_on_plate",
+      "category": "work",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir beaucoup de travail.",
+        "en": "To have a lot of work to do."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir du pain sur la planche.",
+          "example": "Pas de vacances pour moi, j'ai du pain sur la planche."
+        },
+        "en": {
+          "text": "To have a lot on one's plate.",
+          "example": "No holidays for me, I've got a lot on my plate."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "En avoir beaucoup dans son assiette.",
+          "example_translation": "Pas de vacances pour moi, j'ai du pain sur la planche.",
+          "note": "Deux images de table : l'assiette anglaise, la planche du boulanger français."
+        },
+        "fr_en": {
+          "literal": "To have bread on the board.",
+          "example_translation": "No holidays for me, I've got a lot on my plate.",
+          "note": "Two food images: an English plate, a French baker's bread board."
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "spin_yarns",
+      "category": "communication",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Raconter des histoires, mentir.",
+        "en": "To tell tall tales."
+      },
+      "forms": {
+        "fr": {
+          "text": "Raconter des salades.",
+          "example": "Ne l'écoute pas, il raconte des salades."
+        },
+        "en": {
+          "text": "To spin yarns.",
+          "example": "Don't listen to him, he's spinning yarns."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Filer des histoires (comme on file la laine).",
+          "example_translation": "Ne l'écoute pas, il raconte des salades.",
+          "note": "L'anglais file la laine, le français vend des salades."
+        },
+        "fr_en": {
+          "literal": "To tell salads.",
+          "example_translation": "Don't listen to him, he's spinning yarns.",
+          "note": "English spins wool; French serves salads."
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "mountain_molehill",
+      "category": "emotions",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Exagérer l'importance d'un petit problème.",
+        "en": "To exaggerate a small problem."
+      },
+      "forms": {
+        "fr": {
+          "text": "En faire tout un fromage.",
+          "example": "Ce n'est qu'un petit retard, n'en fais pas tout un fromage."
+        },
+        "en": {
+          "text": "To make a mountain out of a molehill.",
+          "example": "It's just a small delay, don't make a mountain out of a molehill."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Faire une montagne d'une taupinière.",
+          "example_translation": "Ce n'est qu'un petit retard, n'en fais pas tout un fromage.",
+          "note": "Le français dit aussi « en faire une montagne » — mais le fromage est plus savoureux."
+        },
+        "fr_en": {
+          "literal": "To make a whole cheese out of it.",
+          "example_translation": "It's just a small delay, don't make a mountain out of a molehill.",
+          "note": "French also says 'en faire une montagne' (make a mountain of it) — but cheese is more on-brand."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "full_of_beans",
+      "category": "emotions",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être en pleine forme, plein d'énergie.",
+        "en": "To be full of energy."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir la pêche.",
+          "example": "J'ai la pêche ce matin !"
+        },
+        "en": {
+          "text": "To be full of beans.",
+          "example": "I'm full of beans this morning!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être plein de haricots.",
+          "example_translation": "J'ai la pêche ce matin !",
+          "note": "Fruits et légumes des deux côtés : haricots anglais, pêche française."
+        },
+        "fr_en": {
+          "literal": "To have the peach.",
+          "example_translation": "I'm full of beans this morning!",
+          "note": "French also says 'avoir la patate' (to have the potato) — produce on both sides."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "end_of_rope",
+      "category": "emotions",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Être épuisé, à bout de forces ou de patience.",
+        "en": "To be exhausted, at one's limit."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être au bout du rouleau.",
+          "example": "Après cette semaine, je suis au bout du rouleau."
+        },
+        "en": {
+          "text": "To be at the end of one's rope.",
+          "example": "After this week, I'm at the end of my rope."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être au bout de sa corde.",
+          "example_translation": "Après cette semaine, je suis au bout du rouleau.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To be at the end of the roll.",
+          "example_translation": "After this week, I'm at the end of my rope.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "pull_the_wool",
+      "category": "suspicion",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Tromper, duper quelqu'un.",
+        "en": "To deceive someone."
+      },
+      "forms": {
+        "fr": {
+          "text": "Rouler quelqu'un dans la farine.",
+          "example": "Ce vendeur t'a roulé dans la farine."
+        },
+        "en": {
+          "text": "To pull the wool over someone's eyes.",
+          "example": "That salesman pulled the wool over your eyes."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Tirer la laine sur les yeux de quelqu'un.",
+          "example_translation": "Ce vendeur t'a roulé dans la farine.",
+          "note": "Laine anglaise, farine française : dans les deux cas, on ne voit plus rien."
+        },
+        "fr_en": {
+          "literal": "To roll someone in flour.",
+          "example_translation": "That salesman pulled the wool over your eyes.",
+          "note": "English wool, French flour: either way, you can't see a thing."
+        }
+      },
+      "tags": [
+        "idiom",
+        "suspicion"
+      ]
+    },
+    {
+      "id": "not_rocket_science",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Ce n'est pas compliqué.",
+        "en": "It's not complicated."
+      },
+      "forms": {
+        "fr": {
+          "text": "Ce n'est pas sorcier.",
+          "example": "Suis la recette, ce n'est pas sorcier !"
+        },
+        "en": {
+          "text": "It's not rocket science.",
+          "example": "Just follow the recipe, it's not rocket science!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Ce n'est pas de la science des fusées.",
+          "example_translation": "Suis la recette, ce n'est pas sorcier !",
+          "note": "La difficulté se mesure en fusées côté anglais, en sorciers côté français."
+        },
+        "fr_en": {
+          "literal": "It's not wizardry.",
+          "example_translation": "Just follow the recipe, it's not rocket science!",
+          "note": "Difficulty is measured in rockets in English, in wizards in French."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "friends_high_places",
+      "category": "work",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir des relations influentes.",
+        "en": "To have influential connections."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir le bras long.",
+          "example": "Il a eu le poste sans entretien : il a le bras long."
+        },
+        "en": {
+          "text": "To have friends in high places.",
+          "example": "He got the job without an interview — he has friends in high places."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir des amis haut placés.",
+          "example_translation": "Il a eu le poste sans entretien : il a le bras long.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have a long arm.",
+          "example_translation": "He got the job without an interview — he has friends in high places.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "tighten_belt",
+      "category": "money",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Réduire ses dépenses.",
+        "en": "To cut down on spending."
+      },
+      "forms": {
+        "fr": {
+          "text": "Se serrer la ceinture.",
+          "example": "Ce mois-ci, on va devoir se serrer la ceinture."
+        },
+        "en": {
+          "text": "To tighten one's belt.",
+          "example": "This month, we'll have to tighten our belts."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Serrer sa ceinture.",
+          "example_translation": "Ce mois-ci, on va devoir se serrer la ceinture.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To tighten one's belt.",
+          "example_translation": "This month, we'll have to tighten our belts.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "money"
+      ]
+    },
+    {
+      "id": "money_down_drain",
+      "category": "money",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Gaspiller son argent.",
+        "en": "To waste money."
+      },
+      "forms": {
+        "fr": {
+          "text": "Jeter l'argent par les fenêtres.",
+          "example": "Arrête ces abonnements, tu jettes l'argent par les fenêtres."
+        },
+        "en": {
+          "text": "To throw money down the drain.",
+          "example": "Cancel those subscriptions, you're throwing money down the drain."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Jeter l'argent dans les égouts.",
+          "example_translation": "Arrête ces abonnements, tu jettes l'argent par les fenêtres.",
+          "note": "L'argent anglais part à l'égout, l'argent français par la fenêtre."
+        },
+        "fr_en": {
+          "literal": "To throw money out of the windows.",
+          "example_translation": "Cancel those subscriptions, you're throwing money down the drain.",
+          "note": "English money goes down the drain, French money flies out the window."
+        }
+      },
+      "tags": [
+        "idiom",
+        "money"
+      ]
+    },
+    {
+      "id": "lucky_star",
+      "category": "luck",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir de la chance dans la vie.",
+        "en": "To be lucky in life."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être né sous une bonne étoile.",
+          "example": "Tout lui réussit, il est né sous une bonne étoile."
+        },
+        "en": {
+          "text": "To be born under a lucky star.",
+          "example": "Everything works out for him — he was born under a lucky star."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être né sous une étoile chanceuse.",
+          "example_translation": "Tout lui réussit, il est né sous une bonne étoile.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To be born under a good star.",
+          "example_translation": "Everything works out for him — he was born under a lucky star.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "luck"
+      ]
+    },
+    {
+      "id": "knock_on_wood",
+      "category": "luck",
+      "level": "A2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Formule pour conjurer le mauvais sort.",
+        "en": "Said to ward off bad luck."
+      },
+      "forms": {
+        "fr": {
+          "text": "Toucher du bois.",
+          "example": "Jamais malade cette année, je touche du bois !"
+        },
+        "en": {
+          "text": "Knock on wood.",
+          "example": "Never sick this year, knock on wood!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Frapper le bois.",
+          "example_translation": "Jamais malade cette année, je touche du bois !",
+          "note": "On frappe en Amérique, on touche en France ; les Britanniques disent aussi « touch wood »."
+        },
+        "fr_en": {
+          "literal": "To touch wood.",
+          "example_translation": "Never sick this year, knock on wood!",
+          "note": "Americans knock, the French touch — and so do the British ('touch wood')."
+        }
+      },
+      "tags": [
+        "idiom",
+        "luck"
+      ]
+    },
+    {
+      "id": "judge_book_cover",
+      "category": "wisdom",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Ne pas juger sur l'apparence.",
+        "en": "Don't judge by appearances."
+      },
+      "forms": {
+        "fr": {
+          "text": "L'habit ne fait pas le moine.",
+          "example": "Méfie-toi des apparences : l'habit ne fait pas le moine."
+        },
+        "en": {
+          "text": "Don't judge a book by its cover.",
+          "example": "Be careful with appearances — don't judge a book by its cover."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Ne jugez pas un livre à sa couverture.",
+          "example_translation": "Méfie-toi des apparences : l'habit ne fait pas le moine.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "The robe does not make the monk.",
+          "example_translation": "Be careful with appearances — don't judge a book by its cover.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "wisdom"
+      ]
+    },
+    {
+      "id": "time_will_tell",
+      "category": "time",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "L'avenir nous le dira.",
+        "en": "The future will tell."
+      },
+      "forms": {
+        "fr": {
+          "text": "Qui vivra verra.",
+          "example": "Est-ce que ça marchera ? Qui vivra verra."
+        },
+        "en": {
+          "text": "Time will tell.",
+          "example": "Will it work? Time will tell."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Le temps le dira.",
+          "example_translation": "Est-ce que ça marchera ? Qui vivra verra.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "He who lives shall see.",
+          "example_translation": "Will it work? Time will tell.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "time"
+      ]
+    },
+    {
+      "id": "last_straw",
+      "category": "emotions",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Le petit détail de trop qui fait tout exploser.",
+        "en": "The final small thing that makes everything blow up."
+      },
+      "forms": {
+        "fr": {
+          "text": "La goutte d'eau qui fait déborder le vase.",
+          "example": "Sa remarque a été la goutte d'eau qui a fait déborder le vase."
+        },
+        "en": {
+          "text": "The straw that broke the camel's back.",
+          "example": "His comment was the straw that broke the camel's back."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "La paille qui a brisé le dos du chameau.",
+          "example_translation": "Sa remarque a été la goutte d'eau qui a fait déborder le vase.",
+          "note": "Une paille et un chameau côté anglais, une goutte et un vase côté français."
+        },
+        "fr_en": {
+          "literal": "The drop of water that makes the vase overflow.",
+          "example_translation": "His comment was the straw that broke the camel's back.",
+          "note": "A straw and a camel in English, a drop and a vase in French."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "strings_to_bow",
+      "category": "work",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir plusieurs compétences ou ressources.",
+        "en": "To have several skills or options."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir plusieurs cordes à son arc.",
+          "example": "Elle code et elle dessine : elle a plusieurs cordes à son arc."
+        },
+        "en": {
+          "text": "To have more than one string to one's bow.",
+          "example": "She codes and she draws — she has more than one string to her bow."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir plus d'une corde à son arc.",
+          "example_translation": "Elle code et elle dessine : elle a plusieurs cordes à son arc.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have several strings to one's bow.",
+          "example_translation": "She codes and she draws — she has more than one string to her bow.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "cart_before_horse",
+      "category": "priorities",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Faire les choses dans le mauvais ordre.",
+        "en": "To do things in the wrong order."
+      },
+      "forms": {
+        "fr": {
+          "text": "Mettre la charrue avant les bœufs.",
+          "example": "Acheter les meubles avant l'appartement, c'est mettre la charrue avant les bœufs."
+        },
+        "en": {
+          "text": "To put the cart before the horse.",
+          "example": "Buying furniture before the flat is putting the cart before the horse."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Mettre la charrette avant le cheval.",
+          "example_translation": "Acheter les meubles avant l'appartement, c'est mettre la charrue avant les bœufs.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To put the plough before the oxen.",
+          "example_translation": "Buying furniture before the flat is putting the cart before the horse.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "priorities"
+      ]
+    },
+    {
+      "id": "same_wavelength",
+      "category": "communication",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Bien se comprendre.",
+        "en": "To understand each other well."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être sur la même longueur d'onde.",
+          "example": "Pas besoin d'explications, on est sur la même longueur d'onde."
+        },
+        "en": {
+          "text": "To be on the same wavelength.",
+          "example": "No need to explain, we're on the same wavelength."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être sur la même longueur d'onde.",
+          "example_translation": "Pas besoin d'explications, on est sur la même longueur d'onde.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To be on the same wavelength.",
+          "example_translation": "No need to explain, we're on the same wavelength.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "fed_up",
+      "category": "emotions",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Ne plus supporter quelque chose.",
+        "en": "To be unable to stand something any longer."
+      },
+      "forms": {
+        "fr": {
+          "text": "En avoir ras le bol.",
+          "example": "J'en ai ras le bol de ce trafic !"
+        },
+        "en": {
+          "text": "To be fed up to the back teeth.",
+          "example": "I'm fed up to the back teeth with this traffic!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être nourri jusqu'aux dents du fond.",
+          "example_translation": "J'en ai ras le bol de ce trafic !",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have the bowl full to the brim.",
+          "example_translation": "I'm fed up to the back teeth with this traffic!",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "french_leave",
+      "category": "everyday",
+      "level": "C1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Partir discrètement sans dire au revoir.",
+        "en": "To leave quietly without saying goodbye."
+      },
+      "forms": {
+        "fr": {
+          "text": "Filer à l'anglaise.",
+          "example": "Il a filé à l'anglaise avant la fin de la soirée."
+        },
+        "en": {
+          "text": "To take French leave.",
+          "example": "He took French leave before the party ended."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Prendre un congé à la française.",
+          "example_translation": "Il a filé à l'anglaise avant la fin de la soirée.",
+          "note": "Chaque langue accuse l'autre : les Français filent « à l'anglaise », les Anglais prennent un congé « à la française »."
+        },
+        "fr_en": {
+          "literal": "To slip away English-style.",
+          "example_translation": "He took French leave before the party ended.",
+          "note": "Each language blames the other: the French sneak off 'English-style', the English take 'French leave'."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "piece_of_cake",
+      "category": "everyday",
+      "level": "A2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Quelque chose de très facile.",
+        "en": "Something very easy."
+      },
+      "forms": {
+        "fr": {
+          "text": "C'est du gâteau.",
+          "example": "Cet exercice ? C'est du gâteau !"
+        },
+        "en": {
+          "text": "It's a piece of cake.",
+          "example": "That exercise? It's a piece of cake!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "C'est une part de gâteau.",
+          "example_translation": "Cet exercice ? C'est du gâteau !",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "It's cake.",
+          "example_translation": "That exercise? It's a piece of cake!",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "win_hands_down",
+      "category": "everyday",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Gagner très facilement.",
+        "en": "To win very easily."
+      },
+      "forms": {
+        "fr": {
+          "text": "Gagner les doigts dans le nez.",
+          "example": "Elle a gagné la course les doigts dans le nez."
+        },
+        "en": {
+          "text": "To win hands down.",
+          "example": "She won the race hands down."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Gagner les mains baissées.",
+          "example_translation": "Elle a gagné la course les doigts dans le nez.",
+          "note": "L'image anglaise vient des courses hippiques : le jockey sûr de gagner baisse les mains."
+        },
+        "fr_en": {
+          "literal": "To win with one's fingers in one's nose.",
+          "example_translation": "She won the race hands down.",
+          "note": "The French jockey is so far ahead he can pick his nose; the English one just lowers his hands."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "under_the_weather",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Ne pas se sentir très bien.",
+        "en": "To feel slightly unwell."
+      },
+      "forms": {
+        "fr": {
+          "text": "Ne pas être dans son assiette.",
+          "example": "Je reste au lit, je ne suis pas dans mon assiette aujourd'hui."
+        },
+        "en": {
+          "text": "To feel under the weather.",
+          "example": "I'm staying in bed, I'm feeling under the weather today."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être sous la météo.",
+          "example_translation": "Je reste au lit, je ne suis pas dans mon assiette aujourd'hui.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "Not to be in one's plate.",
+          "example_translation": "I'm staying in bed, I'm feeling under the weather today.",
+          "note": "The 'assiette' was originally a rider's seat and balance, not the dinner plate — but everyone pictures the plate now."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "spill_the_beans",
+      "category": "communication",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Révéler un secret.",
+        "en": "To reveal a secret."
+      },
+      "forms": {
+        "fr": {
+          "text": "Vendre la mèche.",
+          "example": "C'est lui qui a vendu la mèche pour la fête surprise."
+        },
+        "en": {
+          "text": "To spill the beans.",
+          "example": "He's the one who spilled the beans about the surprise party."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Renverser les haricots.",
+          "example_translation": "C'est lui qui a vendu la mèche pour la fête surprise.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To sell the fuse.",
+          "example_translation": "He's the one who spilled the beans about the surprise party.",
+          "note": "The 'mèche' is the fuse of an old cannon — sell it and the whole plan is betrayed."
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "far_fetched",
+      "category": "communication",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Peu crédible, exagérément compliqué.",
+        "en": "Hard to believe, overly contrived."
+      },
+      "forms": {
+        "fr": {
+          "text": "C'est tiré par les cheveux.",
+          "example": "Son excuse est un peu tirée par les cheveux."
+        },
+        "en": {
+          "text": "That's far-fetched.",
+          "example": "His excuse is a bit far-fetched."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Allé chercher très loin.",
+          "example_translation": "Son excuse est un peu tirée par les cheveux.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "Pulled by the hair.",
+          "example_translation": "His excuse is a bit far-fetched.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "free_rein",
+      "category": "work",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir toute liberté d'agir.",
+        "en": "To have complete freedom to act."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir carte blanche.",
+          "example": "Le directeur m'a donné carte blanche pour ce projet."
+        },
+        "en": {
+          "text": "To have free rein.",
+          "example": "The director gave me free rein on this project."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir les rênes libres.",
+          "example_translation": "Le directeur m'a donné carte blanche pour ce projet.",
+          "note": "L'anglais a aussi emprunté « carte blanche » directement au français."
+        },
+        "fr_en": {
+          "literal": "To have a white card.",
+          "example_translation": "The director gave me free rein on this project.",
+          "note": "English also borrowed 'carte blanche' straight from French — both work."
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "different_ball_game",
+      "category": "everyday",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "C'est une tout autre affaire.",
+        "en": "That's an entirely different matter."
+      },
+      "forms": {
+        "fr": {
+          "text": "C'est une autre paire de manches.",
+          "example": "Le dire, d'accord ; le faire, c'est une autre paire de manches."
+        },
+        "en": {
+          "text": "That's a whole different ball game.",
+          "example": "Saying it is one thing; doing it is a whole different ball game."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "C'est un tout autre match.",
+          "example_translation": "Le dire, d'accord ; le faire, c'est une autre paire de manches.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "That's another pair of sleeves.",
+          "example_translation": "Saying it is one thing; doing it is a whole different ball game.",
+          "note": "The sleeves come from medieval fashion: sleeves were detachable, so changing them changed the outfit."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "barking_wrong_tree",
+      "category": "suspicion",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Se tromper complètement.",
+        "en": "To be completely mistaken."
+      },
+      "forms": {
+        "fr": {
+          "text": "Se mettre le doigt dans l'œil.",
+          "example": "Si tu crois que je vais payer, tu te mets le doigt dans l'œil."
+        },
+        "en": {
+          "text": "To be barking up the wrong tree.",
+          "example": "If you think I'm going to pay, you're barking up the wrong tree."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Aboyer au pied du mauvais arbre.",
+          "example_translation": "Si tu crois que je vais payer, tu te mets le doigt dans l'œil.",
+          "note": "L'image anglaise vient du chien de chasse qui aboie sous un arbre... où le gibier n'est plus."
+        },
+        "fr_en": {
+          "literal": "To put one's finger in one's eye.",
+          "example_translation": "If you think I'm going to pay, you're barking up the wrong tree.",
+          "note": "The English image is a hunting dog barking under a tree the prey has already left."
+        }
+      },
+      "tags": [
+        "idiom",
+        "suspicion"
+      ]
+    },
+    {
+      "id": "two_birds_one_stone",
+      "category": "priorities",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Obtenir deux résultats d'un seul coup.",
+        "en": "To achieve two things at once."
+      },
+      "forms": {
+        "fr": {
+          "text": "Faire d'une pierre deux coups.",
+          "example": "En passant par la poste, je fais d'une pierre deux coups."
+        },
+        "en": {
+          "text": "To kill two birds with one stone.",
+          "example": "By stopping at the post office, I kill two birds with one stone."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Tuer deux oiseaux avec une pierre.",
+          "example_translation": "En passant par la poste, je fais d'une pierre deux coups.",
+          "note": "Même pierre, mais pas d'oiseaux côté français."
+        },
+        "fr_en": {
+          "literal": "To strike two blows with one stone.",
+          "example_translation": "By stopping at the post office, I kill two birds with one stone.",
+          "note": "Same stone, but the French spare the birds."
+        }
+      },
+      "tags": [
+        "idiom",
+        "priorities"
+      ]
+    },
+    {
+      "id": "have_guts",
+      "category": "character",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être audacieux, ne pas avoir peur.",
+        "en": "To be bold and fearless."
+      },
+      "forms": {
+        "fr": {
+          "text": "Ne pas avoir froid aux yeux.",
+          "example": "Elle a démissionné pour faire le tour du monde : elle n'a pas froid aux yeux."
+        },
+        "en": {
+          "text": "To have guts.",
+          "example": "She quit her job to travel the world — she's got guts."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir des tripes.",
+          "example_translation": "Elle a démissionné pour faire le tour du monde : elle n'a pas froid aux yeux.",
+          "note": "Les tripes anglaises contre les yeux français : le courage se loge où il peut."
+        },
+        "fr_en": {
+          "literal": "Not to have cold eyes.",
+          "example_translation": "She quit her job to travel the world — she's got guts.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "take_to_heels",
+      "category": "trouble",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "S'enfuir en courant.",
+        "en": "To run away fast."
+      },
+      "forms": {
+        "fr": {
+          "text": "Prendre ses jambes à son cou.",
+          "example": "En voyant le chien, il a pris ses jambes à son cou."
+        },
+        "en": {
+          "text": "To take to one's heels.",
+          "example": "When he saw the dog, he took to his heels."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Prendre ses talons.",
+          "example_translation": "En voyant le chien, il a pris ses jambes à son cou.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To take one's legs to one's neck.",
+          "example_translation": "When he saw the dog, he took to his heels.",
+          "note": "Legs around the neck: the French image of a bundle slung over the shoulder before fleeing."
+        }
+      },
+      "tags": [
+        "idiom",
+        "trouble"
+      ]
+    },
+    {
+      "id": "icing_on_cake",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Le détail final qui parfait le tout (parfois ironique).",
+        "en": "The final touch that makes it perfect (sometimes ironic)."
+      },
+      "forms": {
+        "fr": {
+          "text": "La cerise sur le gâteau.",
+          "example": "Et en plus il fait beau : c'est la cerise sur le gâteau !"
+        },
+        "en": {
+          "text": "The icing on the cake.",
+          "example": "And the weather's great too — that's the icing on the cake!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Le glaçage sur le gâteau.",
+          "example_translation": "Et en plus il fait beau : c'est la cerise sur le gâteau !",
+          "note": "L'anglais dit aussi « the cherry on top » — les deux images cohabitent."
+        },
+        "fr_en": {
+          "literal": "The cherry on the cake.",
+          "example_translation": "And the weather's great too — that's the icing on the cake!",
+          "note": "English also says 'the cherry on top' — both images exist."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "gift_of_gab",
+      "category": "communication",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Parler beaucoup et avec aisance.",
+        "en": "To talk a lot with great ease."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir la langue bien pendue.",
+          "example": "Elle a la langue bien pendue, impossible de l'arrêter."
+        },
+        "en": {
+          "text": "To have the gift of the gab.",
+          "example": "She's got the gift of the gab, there's no stopping her."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir le don du bagou.",
+          "example_translation": "Elle a la langue bien pendue, impossible de l'arrêter.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have a well-hung tongue.",
+          "example_translation": "She's got the gift of the gab, there's no stopping her.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "pearls_before_swine",
+      "category": "wisdom",
+      "level": "C1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Offrir quelque chose de précieux à qui ne peut l'apprécier.",
+        "en": "To offer something precious to those who can't appreciate it."
+      },
+      "forms": {
+        "fr": {
+          "text": "Donner de la confiture aux cochons.",
+          "example": "Ce grand cru pour lui ? C'est donner de la confiture aux cochons."
+        },
+        "en": {
+          "text": "To cast pearls before swine.",
+          "example": "That fine wine for him? It's casting pearls before swine."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Jeter des perles aux pourceaux.",
+          "example_translation": "Ce grand cru pour lui ? C'est donner de la confiture aux cochons.",
+          "note": "Les cochons sont des deux côtés : perles bibliques en anglais, confiture en français."
+        },
+        "fr_en": {
+          "literal": "To give jam to the pigs.",
+          "example_translation": "That fine wine for him? It's casting pearls before swine.",
+          "note": "Pigs on both sides: English throws them biblical pearls, French spreads them jam."
+        }
+      },
+      "tags": [
+        "idiom",
+        "wisdom"
+      ]
+    },
+    {
+      "id": "short_fuse",
+      "category": "character",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Se mettre en colère très vite.",
+        "en": "To lose one's temper very quickly."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être soupe au lait.",
+          "example": "Attention à ce que tu dis, il est très soupe au lait."
+        },
+        "en": {
+          "text": "To have a short fuse.",
+          "example": "Watch what you say, he's got a very short fuse."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir une mèche courte.",
+          "example_translation": "Attention à ce que tu dis, il est très soupe au lait.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To be milk soup.",
+          "example_translation": "Watch what you say, he's got a very short fuse.",
+          "note": "Milk soup boils over the instant you look away — so does he."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "nothing_write_home",
+      "category": "everyday",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Rien d'extraordinaire.",
+        "en": "Nothing special."
+      },
+      "forms": {
+        "fr": {
+          "text": "Ça ne casse pas trois pattes à un canard.",
+          "example": "Le film était correct, mais ça ne casse pas trois pattes à un canard."
+        },
+        "en": {
+          "text": "It's nothing to write home about.",
+          "example": "The movie was okay, but it's nothing to write home about."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Il n'y a pas de quoi écrire à la maison.",
+          "example_translation": "Le film était correct, mais ça ne casse pas trois pattes à un canard.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "It doesn't break three legs off a duck.",
+          "example_translation": "The movie was okay, but it's nothing to write home about.",
+          "note": "Why three legs, when a duck has two? Exactly — breaking three would be a real feat."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "big_headed",
+      "category": "character",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être prétentieux, avoir pris la grosse tête.",
+        "en": "To be conceited."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir le melon.",
+          "example": "Depuis son succès, il a le melon."
+        },
+        "en": {
+          "text": "To be big-headed.",
+          "example": "Ever since his success, he's been big-headed."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir la grosse tête.",
+          "example_translation": "Depuis son succès, il a le melon.",
+          "note": "Le français dit aussi « avoir la grosse tête » — le melon en est la version fruitée."
+        },
+        "fr_en": {
+          "literal": "To have the melon.",
+          "example_translation": "Ever since his success, he's been big-headed.",
+          "note": "French also says 'avoir la grosse tête' (big head) — the melon is the fruity version."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "blow_a_fuse",
+      "category": "emotions",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Perdre son sang-froid, exploser de colère.",
+        "en": "To lose one's temper suddenly."
+      },
+      "forms": {
+        "fr": {
+          "text": "Péter les plombs.",
+          "example": "Quand il a vu la facture, il a pété les plombs."
+        },
+        "en": {
+          "text": "To blow a fuse.",
+          "example": "When he saw the bill, he blew a fuse."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Faire sauter un fusible.",
+          "example_translation": "Quand il a vu la facture, il a pété les plombs.",
+          "note": "Même image électrique des deux côtés."
+        },
+        "fr_en": {
+          "literal": "To blow the fuses.",
+          "example_translation": "When he saw the bill, he blew a fuse.",
+          "note": "The exact same electrical image in both languages."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "hangover",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Malaise du lendemain de fête.",
+        "en": "The morning-after effects of drinking."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir la gueule de bois.",
+          "example": "Trop de champagne hier : ce matin, j'ai la gueule de bois."
+        },
+        "en": {
+          "text": "To have a hangover.",
+          "example": "Too much champagne last night — this morning I have a hangover."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir un « reste suspendu » de la veille.",
+          "example_translation": "Trop de champagne hier : ce matin, j'ai la gueule de bois.",
+          "note": "Pas d'image en anglais : le « hangover » est ce qui « reste suspendu » de la veille."
+        },
+        "fr_en": {
+          "literal": "To have a wooden mug.",
+          "example_translation": "Too much champagne last night — this morning I have a hangover.",
+          "note": "The French wake up with a mouth as dry as wood; English just has what's 'hanging over' from last night."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "bitterly_cold",
+      "category": "weather",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Un froid intense.",
+        "en": "Intensely cold weather."
+      },
+      "forms": {
+        "fr": {
+          "text": "Un froid de canard.",
+          "example": "Couvre-toi bien, il fait un froid de canard !"
+        },
+        "en": {
+          "text": "Bitterly cold.",
+          "example": "Wrap up warm, it's bitterly cold out!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Un froid amer.",
+          "example_translation": "Couvre-toi bien, il fait un froid de canard !",
+          "note": "Pas d'expression imagée courante en anglais ; « bitterly cold » rend l'intensité."
+        },
+        "fr_en": {
+          "literal": "A duck's cold.",
+          "example_translation": "Wrap up warm, it's bitterly cold out!",
+          "note": "The duck comes from duck-hunting season, in the dead of winter. English has no bird here."
+        }
+      },
+      "tags": [
+        "idiom",
+        "weather"
+      ]
+    },
+    {
+      "id": "rose_tinted",
+      "category": "emotions",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Voir tout de façon optimiste.",
+        "en": "To see everything optimistically."
+      },
+      "forms": {
+        "fr": {
+          "text": "Voir la vie en rose.",
+          "example": "Depuis qu'ils se sont rencontrés, elle voit la vie en rose."
+        },
+        "en": {
+          "text": "To see the world through rose-tinted glasses.",
+          "example": "Ever since they met, she's been seeing the world through rose-tinted glasses."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Voir le monde à travers des lunettes teintées de rose.",
+          "example_translation": "Depuis qu'ils se sont rencontrés, elle voit la vie en rose.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To see life in pink.",
+          "example_translation": "Ever since they met, she's been seeing the world through rose-tinted glasses.",
+          "note": "Yes — this is the Édith Piaf song: 'La Vie en rose'."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "in_a_pickle",
+      "category": "trouble",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être dans une situation très embarrassante.",
+        "en": "To be in an awkward, difficult situation."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être dans le pétrin.",
+          "example": "Sans passeport à l'aéroport, on est dans le pétrin."
+        },
+        "en": {
+          "text": "To be in a pickle.",
+          "example": "At the airport with no passport — we're in a pickle."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être dans le bocal de cornichons.",
+          "example_translation": "Sans passeport à l'aéroport, on est dans le pétrin.",
+          "note": "Deux images de cuisine : le cornichon anglais, le pétrin du boulanger français."
+        },
+        "fr_en": {
+          "literal": "To be in the kneading trough.",
+          "example_translation": "At the airport with no passport — we're in a pickle.",
+          "note": "Two kitchen images: an English pickle jar, a French baker's kneading trough."
+        }
+      },
+      "tags": [
+        "idiom",
+        "trouble"
+      ]
+    },
+    {
+      "id": "pitch_in",
+      "category": "work",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Participer, aider à la tâche.",
+        "en": "To join in and help."
+      },
+      "forms": {
+        "fr": {
+          "text": "Mettre la main à la pâte.",
+          "example": "Tout le monde met la main à la pâte pour le déménagement."
+        },
+        "en": {
+          "text": "To pitch in.",
+          "example": "Everyone's pitching in for the move."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Se lancer dedans.",
+          "example_translation": "Tout le monde met la main à la pâte pour le déménagement.",
+          "note": "Pas d'image côté anglais ; le français retourne au fournil."
+        },
+        "fr_en": {
+          "literal": "To put one's hand in the dough.",
+          "example_translation": "Everyone's pitching in for the move.",
+          "note": "No image in English; the French head back to the bakery."
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "bull_by_horns",
+      "category": "work",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Affronter un problème avec détermination.",
+        "en": "To confront a problem head-on."
+      },
+      "forms": {
+        "fr": {
+          "text": "Prendre le taureau par les cornes.",
+          "example": "Assez attendu : je prends le taureau par les cornes et je l'appelle."
+        },
+        "en": {
+          "text": "To take the bull by the horns.",
+          "example": "Enough waiting — I'm taking the bull by the horns and calling him."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Prendre le taureau par les cornes.",
+          "example_translation": "Assez attendu : je prends le taureau par les cornes et je l'appelle.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To take the bull by the horns.",
+          "example_translation": "Enough waiting — I'm taking the bull by the horns and calling him.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "hollow_laugh",
+      "category": "emotions",
+      "level": "C1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Rire de façon forcée pour masquer sa gêne.",
+        "en": "To laugh in a forced way to hide discomfort."
+      },
+      "forms": {
+        "fr": {
+          "text": "Rire jaune.",
+          "example": "La blague était sur lui : il a ri jaune."
+        },
+        "en": {
+          "text": "To give a hollow laugh.",
+          "example": "The joke was on him — he gave a hollow laugh."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir un rire creux.",
+          "example_translation": "La blague était sur lui : il a ri jaune.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To laugh yellow.",
+          "example_translation": "The joke was on him — he gave a hollow laugh.",
+          "note": "In French, a fake laugh has a colour: yellow."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "eat_a_horse",
+      "category": "food",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Avoir extrêmement faim.",
+        "en": "To be extremely hungry."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir une faim de loup.",
+          "example": "On mange bientôt ? J'ai une faim de loup !"
+        },
+        "en": {
+          "text": "I could eat a horse.",
+          "example": "Are we eating soon? I could eat a horse!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Je pourrais manger un cheval.",
+          "example_translation": "On mange bientôt ? J'ai une faim de loup !",
+          "note": "L'anglais mangerait un cheval entier ; le français a l'appétit du loup."
+        },
+        "fr_en": {
+          "literal": "To have a wolf's hunger.",
+          "example_translation": "Are we eating soon? I could eat a horse!",
+          "note": "The English could eat a whole horse; the French merely hunger like a wolf."
+        }
+      },
+      "tags": [
+        "idiom",
+        "food"
+      ]
+    },
+    {
+      "id": "cock_and_bull",
+      "category": "communication",
+      "level": "C1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Une histoire invraisemblable.",
+        "en": "An unbelievable, absurd story."
+      },
+      "forms": {
+        "fr": {
+          "text": "Une histoire à dormir debout.",
+          "example": "Son alibi ? Une histoire à dormir debout."
+        },
+        "en": {
+          "text": "A cock-and-bull story.",
+          "example": "His alibi? A cock-and-bull story."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Une histoire de coq et de taureau.",
+          "example_translation": "Son alibi ? Une histoire à dormir debout.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "A story to make you sleep standing up.",
+          "example_translation": "His alibi? A cock-and-bull story.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "head_in_sand",
+      "category": "character",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Refuser de voir la réalité.",
+        "en": "To refuse to face reality."
+      },
+      "forms": {
+        "fr": {
+          "text": "Faire l'autruche.",
+          "example": "Ouvre tes factures, arrête de faire l'autruche."
+        },
+        "en": {
+          "text": "To bury one's head in the sand.",
+          "example": "Open your bills, stop burying your head in the sand."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Enterrer sa tête dans le sable.",
+          "example_translation": "Ouvre tes factures, arrête de faire l'autruche.",
+          "note": "Même oiseau : l'anglais décrit son geste, le français le nomme."
+        },
+        "fr_en": {
+          "literal": "To do the ostrich.",
+          "example_translation": "Open your bills, stop burying your head in the sand.",
+          "note": "Same ostrich: French names the bird, English describes what it does."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "worm_out_info",
+      "category": "communication",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Faire parler quelqu'un habilement.",
+        "en": "To skilfully get information out of someone."
+      },
+      "forms": {
+        "fr": {
+          "text": "Tirer les vers du nez à quelqu'un.",
+          "example": "Elle a fini par me tirer les vers du nez."
+        },
+        "en": {
+          "text": "To worm information out of someone.",
+          "example": "She eventually wormed it out of me."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Extraire l'information comme un ver.",
+          "example_translation": "Elle a fini par me tirer les vers du nez.",
+          "note": "Des vers des deux côtés — mais seul le français les loge dans le nez."
+        },
+        "fr_en": {
+          "literal": "To pull the worms out of someone's nose.",
+          "example_translation": "She eventually wormed it out of me.",
+          "note": "Worms on both sides — but only French keeps them in the nose."
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "rack_ones_brains",
+      "category": "work",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Réfléchir intensément.",
+        "en": "To think very hard."
+      },
+      "forms": {
+        "fr": {
+          "text": "Se creuser la tête.",
+          "example": "Je me creuse la tête, mais je ne retrouve pas son nom."
+        },
+        "en": {
+          "text": "To rack one's brains.",
+          "example": "I'm racking my brains, but I can't remember his name."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Mettre sa cervelle au chevalet (de torture).",
+          "example_translation": "Je me creuse la tête, mais je ne retrouve pas son nom.",
+          "note": "Le « rack » anglais est un chevalet de torture médiéval."
+        },
+        "fr_en": {
+          "literal": "To dig into one's head.",
+          "example_translation": "I'm racking my brains, but I can't remember his name.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "split_difference",
+      "category": "priorities",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Trouver un compromis.",
+        "en": "To find a compromise."
+      },
+      "forms": {
+        "fr": {
+          "text": "Couper la poire en deux.",
+          "example": "Tu veux 100, je propose 50 : coupons la poire en deux."
+        },
+        "en": {
+          "text": "To split the difference.",
+          "example": "You want 100, I'm offering 50 — let's split the difference."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Partager la différence.",
+          "example_translation": "Tu veux 100, je propose 50 : coupons la poire en deux.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To cut the pear in two.",
+          "example_translation": "You want 100, I'm offering 50 — let's split the difference.",
+          "note": "In a French negotiation, the compromise is always a shared pear."
+        }
+      },
+      "tags": [
+        "idiom",
+        "priorities"
+      ]
+    },
+    {
+      "id": "keep_cool_head",
+      "category": "character",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Rester calme sous la pression.",
+        "en": "To stay calm under pressure."
+      },
+      "forms": {
+        "fr": {
+          "text": "Garder la tête froide.",
+          "example": "Même sous pression, elle garde la tête froide."
+        },
+        "en": {
+          "text": "To keep a cool head.",
+          "example": "Even under pressure, she keeps a cool head."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Garder une tête fraîche.",
+          "example_translation": "Même sous pression, elle garde la tête froide.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To keep a cold head.",
+          "example_translation": "Even under pressure, she keeps a cool head.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "trick_up_sleeve",
+      "category": "character",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir des ressources cachées.",
+        "en": "To have hidden resources."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir plus d'un tour dans son sac.",
+          "example": "Ne le sous-estime pas, il a plus d'un tour dans son sac."
+        },
+        "en": {
+          "text": "To have more than one trick up one's sleeve.",
+          "example": "Don't underestimate him, he has more than one trick up his sleeve."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir plus d'un tour dans sa manche.",
+          "example_translation": "Ne le sous-estime pas, il a plus d'un tour dans son sac.",
+          "note": "La manche du magicien anglais, le sac du camelot français."
+        },
+        "fr_en": {
+          "literal": "To have more than one trick in one's bag.",
+          "example_translation": "Don't underestimate him, he has more than one trick up his sleeve.",
+          "note": "An English magician's sleeve, a French peddler's bag."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character"
+      ]
+    },
+    {
+      "id": "sleep_on_it",
+      "category": "wisdom",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Attendre le lendemain pour décider.",
+        "en": "To wait until tomorrow before deciding."
+      },
+      "forms": {
+        "fr": {
+          "text": "La nuit porte conseil.",
+          "example": "Ne signe rien ce soir : la nuit porte conseil."
+        },
+        "en": {
+          "text": "Sleep on it.",
+          "example": "Don't sign anything tonight — sleep on it."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Dors dessus.",
+          "example_translation": "Ne signe rien ce soir : la nuit porte conseil.",
+          "note": "L'anglais est un conseil pratique ; le français, presque un proverbe poétique."
+        },
+        "fr_en": {
+          "literal": "The night brings counsel.",
+          "example_translation": "Don't sign anything tonight — sleep on it.",
+          "note": "The English version is practical advice; the French one is nearly a poem."
+        }
+      },
+      "tags": [
+        "idiom",
+        "wisdom"
+      ]
+    },
+    {
+      "id": "once_bitten",
+      "category": "wisdom",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Une mauvaise expérience rend prudent.",
+        "en": "A bad experience makes you cautious."
+      },
+      "forms": {
+        "fr": {
+          "text": "Chat échaudé craint l'eau froide.",
+          "example": "Il ne prête plus rien : chat échaudé craint l'eau froide."
+        },
+        "en": {
+          "text": "Once bitten, twice shy.",
+          "example": "He doesn't lend anything anymore — once bitten, twice shy."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Mordu une fois, deux fois craintif.",
+          "example_translation": "Il ne prête plus rien : chat échaudé craint l'eau froide.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "A scalded cat fears even cold water.",
+          "example_translation": "He doesn't lend anything anymore — once bitten, twice shy.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "wisdom"
+      ]
+    },
+    {
+      "id": "blink_of_eye",
+      "category": "time",
+      "level": "A2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Très rapidement.",
+        "en": "Very quickly."
+      },
+      "forms": {
+        "fr": {
+          "text": "En un clin d'œil.",
+          "example": "Le gâteau a disparu en un clin d'œil."
+        },
+        "en": {
+          "text": "In the blink of an eye.",
+          "example": "The cake disappeared in the blink of an eye."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "En un clignement d'œil.",
+          "example_translation": "Le gâteau a disparu en un clin d'œil.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "In a wink of the eye.",
+          "example_translation": "The cake disappeared in the blink of an eye.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "time"
+      ]
+    },
+    {
+      "id": "third_wheel",
+      "category": "love",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être de trop avec un couple.",
+        "en": "To be the unwanted extra person with a couple."
+      },
+      "forms": {
+        "fr": {
+          "text": "Tenir la chandelle.",
+          "example": "Ils se tenaient la main tout le dîner ; moi, je tenais la chandelle."
+        },
+        "en": {
+          "text": "To be the third wheel.",
+          "example": "They held hands all through dinner — I was the third wheel."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être la troisième roue.",
+          "example_translation": "Ils se tenaient la main tout le dîner ; moi, je tenais la chandelle.",
+          "note": "La troisième roue anglaise ne sert à rien ; le porteur de chandelle français éclairait jadis la chambre des amoureux."
+        },
+        "fr_en": {
+          "literal": "To hold the candle.",
+          "example_translation": "They held hands all through dinner — I was the third wheel.",
+          "note": "The French third wheel holds a candle — a servant once lit the lovers' room."
+        }
+      },
+      "tags": [
+        "idiom",
+        "love"
+      ]
+    },
+    {
+      "id": "all_nighter",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Passer la nuit sans dormir (travail, fête...).",
+        "en": "To stay up all night (working, partying...)."
+      },
+      "forms": {
+        "fr": {
+          "text": "Passer une nuit blanche.",
+          "example": "J'ai passé une nuit blanche pour finir le dossier."
+        },
+        "en": {
+          "text": "To pull an all-nighter.",
+          "example": "I pulled an all-nighter to finish the report."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Tirer une « nuit entière ».",
+          "example_translation": "J'ai passé une nuit blanche pour finir le dossier.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To spend a white night.",
+          "example_translation": "I pulled an all-nighter to finish the report.",
+          "note": "In French, a sleepless night is a 'white night'."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "flat_broke",
+      "category": "money",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Ne plus avoir d'argent du tout.",
+        "en": "To have no money at all."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être fauché comme les blés.",
+          "example": "Impossible de sortir ce soir, je suis fauché comme les blés."
+        },
+        "en": {
+          "text": "To be flat broke.",
+          "example": "Can't go out tonight, I'm flat broke."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être cassé à plat.",
+          "example_translation": "Impossible de sortir ce soir, je suis fauché comme les blés.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To be mown like the wheat.",
+          "example_translation": "Can't go out tonight, I'm flat broke.",
+          "note": "'Fauché' is the scythe's work: cut down like a wheat field after harvest."
+        }
+      },
+      "tags": [
+        "idiom",
+        "money"
+      ]
+    },
+    {
+      "id": "rolling_in_money",
+      "category": "money",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être très riche.",
+        "en": "To be very rich."
+      },
+      "forms": {
+        "fr": {
+          "text": "Rouler sur l'or.",
+          "example": "Depuis la vente de sa boîte, il roule sur l'or."
+        },
+        "en": {
+          "text": "To be rolling in money.",
+          "example": "Since selling his company, he's been rolling in money."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Rouler dans l'argent.",
+          "example_translation": "Depuis la vente de sa boîte, il roule sur l'or.",
+          "note": "On roule des deux côtés : sur l'or en français, dans l'argent en anglais."
+        },
+        "fr_en": {
+          "literal": "To roll on gold.",
+          "example_translation": "Since selling his company, he's been rolling in money.",
+          "note": "Rolling on both sides: on gold in French, in money in English."
+        }
+      },
+      "tags": [
+        "idiom",
+        "money"
+      ]
+    },
+    {
+      "id": "make_ends_meet",
+      "category": "money",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Réussir tout juste à payer ses dépenses.",
+        "en": "To just barely cover one's expenses."
+      },
+      "forms": {
+        "fr": {
+          "text": "Joindre les deux bouts.",
+          "example": "Avec ce loyer, difficile de joindre les deux bouts."
+        },
+        "en": {
+          "text": "To make ends meet.",
+          "example": "With this rent, it's hard to make ends meet."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Faire se rejoindre les bouts.",
+          "example_translation": "Avec ce loyer, difficile de joindre les deux bouts.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To join the two ends.",
+          "example_translation": "With this rent, it's hard to make ends meet.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "money"
+      ]
+    },
+    {
+      "id": "silver_lining",
+      "category": "weather",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Après les difficultés viennent des jours meilleurs.",
+        "en": "Better days follow hard times."
+      },
+      "forms": {
+        "fr": {
+          "text": "Après la pluie, le beau temps.",
+          "example": "Courage : après la pluie, le beau temps."
+        },
+        "en": {
+          "text": "Every cloud has a silver lining.",
+          "example": "Cheer up — every cloud has a silver lining."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Chaque nuage a une doublure d'argent.",
+          "example_translation": "Courage : après la pluie, le beau temps.",
+          "note": "Deux images météo : la doublure argentée du nuage anglais, l'éclaircie française."
+        },
+        "fr_en": {
+          "literal": "After the rain, fine weather.",
+          "example_translation": "Cheer up — every cloud has a silver lining.",
+          "note": "Two weather images: the English cloud's silver lining, the French clear-up after rain."
+        }
+      },
+      "tags": [
+        "idiom",
+        "weather"
+      ]
+    },
+    {
+      "id": "get_in_huff",
+      "category": "emotions",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Se vexer pour peu de chose.",
+        "en": "To take offense at a small thing."
+      },
+      "forms": {
+        "fr": {
+          "text": "Prendre la mouche.",
+          "example": "On ne peut rien lui dire, il prend la mouche tout de suite."
+        },
+        "en": {
+          "text": "To get in a huff.",
+          "example": "You can't tell him anything, he gets in a huff right away."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Se mettre dans une bouffée (de colère).",
+          "example_translation": "On ne peut rien lui dire, il prend la mouche tout de suite.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To take the fly.",
+          "example_translation": "You can't tell him anything, he gets in a huff right away.",
+          "note": "The fly in question is the biting kind that sends horses into a sudden frenzy."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions"
+      ]
+    },
+    {
+      "id": "red_as_beet",
+      "category": "appearance",
+      "level": "A2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Rougir fortement.",
+        "en": "To blush intensely."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être rouge comme une tomate.",
+          "example": "Quand elle l'a vu, elle est devenue rouge comme une tomate."
+        },
+        "en": {
+          "text": "To be as red as a beet.",
+          "example": "When she saw him, she turned as red as a beet."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Rouge comme une betterave.",
+          "example_translation": "Quand elle l'a vu, elle est devenue rouge comme une tomate.",
+          "note": "Chacun son légume : betterave anglaise, tomate française."
+        },
+        "fr_en": {
+          "literal": "Red as a tomato.",
+          "example_translation": "When she saw him, she turned as red as a beet.",
+          "note": "Pick your vegetable: beet in English, tomato in French."
+        }
+      },
+      "tags": [
+        "idiom",
+        "appearance"
+      ]
+    },
+    {
+      "id": "run_for_money",
+      "category": "work",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Donner beaucoup de difficultés à quelqu'un.",
+        "en": "To make things really difficult for someone."
+      },
+      "forms": {
+        "fr": {
+          "text": "Donner du fil à retordre.",
+          "example": "Ce dossier m'a donné du fil à retordre."
+        },
+        "en": {
+          "text": "To give someone a run for their money.",
+          "example": "That case gave me a run for my money."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Faire courir quelqu'un pour son argent.",
+          "example_translation": "Ce dossier m'a donné du fil à retordre.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To give thread to re-twist.",
+          "example_translation": "That case gave me a run for my money.",
+          "note": "Twisting threads back together was slow, fiddly textile work — hence the difficulty."
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "in_the_bag",
+      "category": "luck",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "C'est gagné d'avance, assuré.",
+        "en": "It's as good as won."
+      },
+      "forms": {
+        "fr": {
+          "text": "C'est dans la poche.",
+          "example": "Ton entretien s'est bien passé ? Alors c'est dans la poche !"
+        },
+        "en": {
+          "text": "It's in the bag.",
+          "example": "Your interview went well? Then it's in the bag!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "C'est dans le sac.",
+          "example_translation": "Ton entretien s'est bien passé ? Alors c'est dans la poche !",
+          "note": "Sac anglais, poche française : l'affaire est rangée dans les deux cas."
+        },
+        "fr_en": {
+          "literal": "It's in the pocket.",
+          "example_translation": "Your interview went well? Then it's in the bag!",
+          "note": "An English bag, a French pocket: either way, it's already put away."
+        }
+      },
+      "tags": [
+        "idiom",
+        "luck"
+      ]
+    },
+    {
+      "id": "draw_a_blank",
+      "category": "work",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Ne rien trouver, échouer dans sa recherche.",
+        "en": "To find nothing, to come up empty."
+      },
+      "forms": {
+        "fr": {
+          "text": "Faire chou blanc.",
+          "example": "J'ai cherché partout, mais j'ai fait chou blanc."
+        },
+        "en": {
+          "text": "To draw a blank.",
+          "example": "I looked everywhere, but I drew a blank."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Tirer un billet blanc (de loterie).",
+          "example_translation": "J'ai cherché partout, mais j'ai fait chou blanc.",
+          "note": "Le « blank » anglais est le billet perdant d'une loterie."
+        },
+        "fr_en": {
+          "literal": "To make white cabbage.",
+          "example_translation": "I looked everywhere, but I drew a blank.",
+          "note": "The 'chou' may not even be a cabbage — possibly an old word for a missed throw at skittles."
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "bounce_back",
+      "category": "everyday",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Reprendre des forces, aller mieux.",
+        "en": "To regain strength, to recover."
+      },
+      "forms": {
+        "fr": {
+          "text": "Reprendre du poil de la bête.",
+          "example": "Après sa grippe, il reprend du poil de la bête."
+        },
+        "en": {
+          "text": "To bounce back.",
+          "example": "After his flu, he's bouncing back."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Rebondir.",
+          "example_translation": "Après sa grippe, il reprend du poil de la bête.",
+          "note": "Attention : « hair of the dog » existe en anglais, mais désigne le verre d'alcool anti-gueule de bois !"
+        },
+        "fr_en": {
+          "literal": "To take back some of the beast's hair.",
+          "example_translation": "After his flu, he's bouncing back.",
+          "note": "Careful: this looks like 'hair of the dog', but that one means a morning-after drink. The French beast just gives your strength back."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "thick_as_thieves",
+      "category": "everyday",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être très proches, inséparables.",
+        "en": "To be very close, inseparable."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être copains comme cochons.",
+          "example": "Ces deux-là sont copains comme cochons depuis l'école."
+        },
+        "en": {
+          "text": "To be thick as thieves.",
+          "example": "Those two have been thick as thieves since school."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être proches comme des voleurs.",
+          "example_translation": "Ces deux-là sont copains comme cochons depuis l'école.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To be pals like pigs.",
+          "example_translation": "Those two have been thick as thieves since school.",
+          "note": "No crime in French — just pigs, from the old word 'soçon' (companion) reshaped into 'cochon'."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday"
+      ]
+    },
+    {
+      "id": "have_a_say",
+      "category": "communication",
+      "level": "C1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Avoir le droit de donner son avis.",
+        "en": "To have the right to weigh in."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir voix au chapitre.",
+          "example": "Sur ce budget, les employés n'ont pas voix au chapitre."
+        },
+        "en": {
+          "text": "To have a say in the matter.",
+          "example": "On this budget, employees have no say in the matter."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir un mot à dire.",
+          "example_translation": "Sur ce budget, les employés n'ont pas voix au chapitre.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have a voice in the chapter.",
+          "example_translation": "On this budget, employees have no say in the matter.",
+          "note": "The 'chapter' is a monastery assembly, where only certain monks could vote."
+        }
+      },
+      "tags": [
+        "idiom",
+        "communication"
+      ]
+    },
+    {
+      "id": "bite_the_dust",
+      "category": "trouble",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Échouer, tomber, être vaincu.",
+        "en": "To fail, fall or be defeated."
+      },
+      "forms": {
+        "fr": {
+          "text": "Mordre la poussière.",
+          "example": "Encore un record qui mord la poussière."
+        },
+        "en": {
+          "text": "To bite the dust.",
+          "example": "Another record bites the dust."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Mordre la poussière.",
+          "example_translation": "Encore un record qui mord la poussière.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To bite the dust.",
+          "example_translation": "Another record bites the dust.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "trouble"
+      ]
+    },
+    {
+      "id": "dressed_to_nines",
+      "category": "appearance",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Être habillé avec un soin extrême.",
+        "en": "To be dressed with extreme care."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être tiré à quatre épingles.",
+          "example": "Il est arrivé au mariage tiré à quatre épingles."
+        },
+        "en": {
+          "text": "To be dressed to the nines.",
+          "example": "He arrived at the wedding dressed to the nines."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être habillé jusqu'au neuf.",
+          "example_translation": "Il est arrivé au mariage tiré à quatre épingles.",
+          "note": "Quatre épingles françaises contre un mystérieux « neuf » anglais dont l'origine reste débattue."
+        },
+        "fr_en": {
+          "literal": "To be pulled by four pins.",
+          "example_translation": "He arrived at the wedding dressed to the nines.",
+          "note": "Four French pins versus a mysterious English 'nine' whose origin is still debated."
+        }
+      },
+      "tags": [
+        "idiom",
+        "appearance"
+      ]
+    },
+    {
+      "id": "smash_hit",
+      "category": "work",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Avoir un grand succès.",
+        "en": "To be a great success."
+      },
+      "forms": {
+        "fr": {
+          "text": "Faire un tabac.",
+          "example": "Sa pièce a fait un tabac à Avignon."
+        },
+        "en": {
+          "text": "To be a smash hit.",
+          "example": "His play was a smash hit in Avignon."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Être un coup fracassant.",
+          "example_translation": "Sa pièce a fait un tabac à Avignon.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To make a tobacco.",
+          "example_translation": "His play was a smash hit in Avignon.",
+          "note": "Nothing to do with smoking: 'tabac' echoes 'coup de tabac', a sailor's sudden storm — like thunderous applause."
+        }
+      },
+      "tags": [
+        "idiom",
+        "work"
+      ]
+    },
+    {
+      "id": "wind_in_sails",
+      "category": "luck",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Être sur une bonne dynamique, réussir.",
+        "en": "To be on a successful streak."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir le vent en poupe.",
+          "example": "Depuis son dernier album, elle a le vent en poupe."
+        },
+        "en": {
+          "text": "To have the wind in one's sails.",
+          "example": "Since her last album, she's had the wind in her sails."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Avoir le vent dans ses voiles.",
+          "example_translation": "Depuis son dernier album, elle a le vent en poupe.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To have the wind at the stern.",
+          "example_translation": "Since her last album, she's had the wind in her sails.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "luck"
+      ]
+    },
+    {
+      "id": "alarm_bells",
+      "category": "suspicion",
+      "level": "B2",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Éveiller les soupçons de quelqu'un.",
+        "en": "To arouse someone's suspicion."
+      },
+      "forms": {
+        "fr": {
+          "text": "Mettre la puce à l'oreille.",
+          "example": "Son hésitation m'a mis la puce à l'oreille."
+        },
+        "en": {
+          "text": "To set alarm bells ringing.",
+          "example": "His hesitation set alarm bells ringing for me."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Faire sonner les cloches d'alarme.",
+          "example_translation": "Son hésitation m'a mis la puce à l'oreille.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "To put the flea in someone's ear.",
+          "example_translation": "His hesitation set alarm bells ringing for me.",
+          "note": "A flea in the ear itches until you pay attention — that's the French alarm system."
+        }
+      },
+      "tags": [
+        "idiom",
+        "suspicion"
+      ]
+    },
+    {
+      "id": "white_as_sheet",
+      "category": "appearance",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Devenir très pâle (peur, choc).",
+        "en": "To turn very pale (fear, shock)."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être blanc comme un linge.",
+          "example": "En apprenant la nouvelle, il est devenu blanc comme un linge."
+        },
+        "en": {
+          "text": "To be as white as a sheet.",
+          "example": "When he heard the news, he turned as white as a sheet."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Blanc comme un drap.",
+          "example_translation": "En apprenant la nouvelle, il est devenu blanc comme un linge.",
+          "note": "Quasi identiques : le drap anglais, le linge français."
+        },
+        "fr_en": {
+          "literal": "White as linen.",
+          "example_translation": "When he heard the news, he turned as white as a sheet.",
+          "note": "Nearly identical: an English sheet, French linen."
+        }
+      },
+      "tags": [
+        "idiom",
+        "appearance"
+      ]
+    },
+    {
+      "id": "walls_have_ears",
+      "category": "suspicion",
+      "level": "B1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Attention, on peut nous écouter.",
+        "en": "Careful, someone may be listening."
+      },
+      "forms": {
+        "fr": {
+          "text": "Les murs ont des oreilles.",
+          "example": "Parle moins fort, les murs ont des oreilles."
+        },
+        "en": {
+          "text": "Walls have ears.",
+          "example": "Keep your voice down — walls have ears."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Les murs ont des oreilles.",
+          "example_translation": "Parle moins fort, les murs ont des oreilles.",
+          "note": null
+        },
+        "fr_en": {
+          "literal": "Walls have ears.",
+          "example_translation": "Keep your voice down — walls have ears.",
+          "note": null
+        }
+      },
+      "tags": [
+        "idiom",
+        "suspicion"
+      ]
+    },
+    {
+      "id": "thumb_a_ride",
+      "category": "everyday",
+      "level": "B1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Faire de l'auto-stop.",
+        "en": "To hitchhike."
+      },
+      "forms": {
+        "fr": {
+          "text": "Faire du pouce.",
+          "example": "On a fait du pouce jusqu'à Québec.",
+          "variant": "fr-CA"
+        },
+        "en": {
+          "text": "To thumb a ride.",
+          "example": "We thumbed a ride all the way to Quebec City."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Attraper un trajet avec le pouce.",
+          "example_translation": "On a fait du pouce jusqu'à Québec.",
+          "note": "Même pouce des deux côtés de la frontière ! En France, on dit plutôt « faire du stop »."
+        },
+        "fr_en": {
+          "literal": "To do the thumb.",
+          "example_translation": "We thumbed a ride all the way to Quebec City.",
+          "note": "A Quebec expression — in France you'd hear 'faire du stop'. Same thumb in both languages."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday",
+        "quebec"
+      ]
+    },
+    {
+      "id": "angel_passes",
+      "category": "everyday",
+      "level": "C1",
+      "register": "neutral",
+      "meaning": {
+        "fr": "Se dit quand un silence gêné s'installe dans une conversation.",
+        "en": "Said when an awkward silence falls over a conversation."
+      },
+      "forms": {
+        "fr": {
+          "text": "Un ange passe.",
+          "example": "Après sa remarque, un ange est passé."
+        }
+      },
+      "glosses": {
+        "fr_en": {
+          "literal": "An angel is passing.",
+          "example_translation": "After his remark, an awkward silence fell.",
+          "note": "No English equivalent: French pictures an angel flying over the suddenly silent room. English just calls it an awkward silence."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday",
+        "no_equivalent"
+      ]
+    },
+    {
+      "id": "born_for_small_bread",
+      "category": "character",
+      "level": "C1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Être destiné à une vie modeste, sans grandes perspectives (souvent employé pour refuser cette fatalité).",
+        "en": "To be destined for a modest life with no great prospects (often used defiantly, to reject that fate)."
+      },
+      "forms": {
+        "fr": {
+          "text": "Être né pour un petit pain.",
+          "example": "Refuse cette offre au rabais : on n'est pas nés pour un petit pain !",
+          "variant": "fr-CA"
+        }
+      },
+      "glosses": {
+        "fr_en": {
+          "literal": "To be born for a small bread roll.",
+          "example_translation": "Turn down that lowball offer — we weren't born to settle for crumbs!",
+          "note": "A Quebec classic with no English equivalent. The 'petit pain' is the humble bread roll of hard times; the phrase is most often used in the negative, to refuse a small destiny."
+        }
+      },
+      "tags": [
+        "idiom",
+        "character",
+        "quebec",
+        "no_equivalent"
+      ]
+    },
+    {
+      "id": "eyes_in_bean_fat",
+      "category": "emotions",
+      "level": "C1",
+      "register": "informal",
+      "meaning": {
+        "fr": "Avoir le regard vague, perdu dans le vide (fatigue ou amour).",
+        "en": "To have a glazed, faraway look (from tiredness or infatuation)."
+      },
+      "forms": {
+        "fr": {
+          "text": "Avoir les yeux dans la graisse de bines.",
+          "example": "Il est en amour, il a les yeux dans la graisse de bines.",
+          "variant": "fr-CA"
+        }
+      },
+      "glosses": {
+        "fr_en": {
+          "literal": "To have one's eyes in the baked-bean fat.",
+          "example_translation": "He's in love — he's got that dreamy, glazed look.",
+          "note": "Pure Quebec, no English equivalent: 'bines' (from 'beans') is the fat of traditional baked beans — picture eyes swimming in it. Bonus Quebec turn in the example: 'être en amour', from 'to be in love'."
+        }
+      },
+      "tags": [
+        "idiom",
+        "emotions",
+        "quebec",
+        "no_equivalent"
+      ]
+    },
+    {
+      "id": "call_shotgun",
+      "category": "everyday",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Réserver la place du passager avant en le criant le premier.",
+        "en": "To claim the front passenger seat by shouting it first."
+      },
+      "forms": {
+        "en": {
+          "text": "To call shotgun.",
+          "example": "I call shotgun for the road trip!"
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Crier « fusil de chasse ».",
+          "example_translation": "Je réserve la place d'en avant pour le road trip !",
+          "note": "Aucun équivalent français : l'image vient des diligences du Far West, où le garde armé s'asseyait à côté du conducteur. Au Québec, on entend souvent « shotgun ! » tel quel."
+        }
+      },
+      "tags": [
+        "idiom",
+        "everyday",
+        "no_equivalent"
+      ]
+    },
+    {
+      "id": "under_the_bus",
+      "category": "trouble",
+      "level": "B2",
+      "register": "informal",
+      "meaning": {
+        "fr": "Sacrifier ou trahir quelqu'un pour se protéger soi-même.",
+        "en": "To sacrifice or betray someone to protect yourself."
+      },
+      "forms": {
+        "en": {
+          "text": "To throw someone under the bus.",
+          "example": "He threw his colleague under the bus to save his own job."
+        }
+      },
+      "glosses": {
+        "en_fr": {
+          "literal": "Jeter quelqu'un sous le bus.",
+          "example_translation": "Il a sacrifié son collègue pour sauver son propre poste.",
+          "note": "Pas d'équivalent établi en français ; le calque « jeter sous le bus » se répand, mais reste perçu comme un anglicisme."
+        }
+      },
+      "tags": [
+        "idiom",
+        "trouble",
+        "no_equivalent"
+      ]
+    }
+  ]
+}
