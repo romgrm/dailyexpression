@@ -40,6 +40,7 @@ Future<void> main() async {
     log: dailyLog,
     planReminders: PlanDailyReminders(clock: clock, userSeed: userSeed),
     scheduler: NotificationLocalDataSource(),
+    settings: settingsRepository,
   );
 
   logger.d(

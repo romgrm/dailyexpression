@@ -1,3 +1,4 @@
+import 'package:app_settings/app_settings.dart' as app_settings;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -66,6 +67,33 @@ class NotificationLocalDataSource implements NotificationScheduler {
   }
 
   @override
+  Future<bool> hasPermission() async {
+    await init();
+
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      return await android.areNotificationsEnabled() ?? false;
+    }
+
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (ios != null) {
+      final options = await ios.checkPermissions();
+      return options?.isEnabled ?? false;
+    }
+
+    return true;
+  }
+
+  @override
+  Future<void> openSystemSettings() {
+    return app_settings.AppSettings.openAppSettings(
+      type: app_settings.AppSettingsType.notification,
+    );
+  }
+
+  @override
   Future<void> schedule(List<ScheduledReminder> reminders) async {
     await init();
     await cancelAll();
@@ -79,6 +107,17 @@ class NotificationLocalDataSource implements NotificationScheduler {
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
     }
+  }
+
+  @override
+  Future<void> showNow(ScheduledReminder reminder) async {
+    await init();
+    await _plugin.show(
+      id: reminder.id,
+      title: reminder.title,
+      body: reminder.body,
+      notificationDetails: _details,
+    );
   }
 
   @override

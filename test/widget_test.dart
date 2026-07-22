@@ -21,7 +21,13 @@ class _NoopScheduler implements NotificationScheduler {
   @override
   Future<bool> requestPermission() async => true;
   @override
+  Future<bool> hasPermission() async => true;
+  @override
+  Future<void> openSystemSettings() async {}
+  @override
   Future<void> schedule(List<ScheduledReminder> reminders) async {}
+  @override
+  Future<void> showNow(ScheduledReminder reminder) async {}
   @override
   Future<void> cancelAll() async {}
 }
@@ -53,6 +59,7 @@ void main() {
           planReminders:
               const PlanDailyReminders(clock: clock, userSeed: 'seed-test'),
           scheduler: const _NoopScheduler(),
+          settings: settingsRepository,
         ),
         clock: clock,
         initialSettings: settingsRepository.read(),

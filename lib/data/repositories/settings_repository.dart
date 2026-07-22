@@ -20,6 +20,7 @@ class SettingsRepository {
   static const _onboardingCompleteKey = 'onboarding_complete';
   static const _userSeedKey = 'user_seed';
   static const _appLanguageKey = 'app_language';
+  static const _notificationRequestedKey = 'notification_permission_requested';
 
   AppSettings read() {
     return AppSettings(
@@ -58,6 +59,16 @@ class SettingsRepository {
       orElse: () => AppThemeMode.system,
     );
   }
+
+  /// Whether we have already asked the OS for notification permission. Once
+  /// true, the OS won't re-prompt, so the UI must send the user to the system
+  /// settings instead of calling [requestPermission] again.
+  bool hasRequestedNotificationPermission() =>
+      _prefs.getBool(_notificationRequestedKey) ?? false;
+
+  /// Records that the notification permission prompt has been shown once.
+  Future<void> markNotificationPermissionRequested() =>
+      _prefs.setBool(_notificationRequestedKey, true);
 
   /// Returns the stable per-user seed, generating and persisting one on first
   /// call. This is the identity that makes the daily stream reproducible and

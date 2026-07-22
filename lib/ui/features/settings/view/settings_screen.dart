@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -5,7 +6,9 @@ import 'package:daily_expression/data/repositories/corpus_repository.dart';
 import 'package:daily_expression/domain/models/app_settings.dart';
 import 'package:daily_expression/domain/models/app_theme_mode.dart';
 import 'package:daily_expression/domain/models/corpus_config.dart';
+import 'package:daily_expression/domain/notifications/notification_permission.dart';
 import 'package:daily_expression/l10n/generated/app_localizations.dart';
+import 'package:daily_expression/ui/core/notifications/reminder_coordinator.dart';
 import 'package:daily_expression/ui/core/settings/settings_cubit.dart';
 import 'package:daily_expression/ui/core/theme/app_spacing.dart';
 import 'package:daily_expression/ui/core/widgets/widgets.dart';
@@ -87,6 +90,7 @@ final class _SettingsBody extends StatelessWidget {
               value: reminder.format(context),
               onTap: () => _pickReminderTime(context, reminder),
             ),
+            _NotificationsRow(settings: settings),
             _SettingsRow(
               icon: Icons.brightness_6_outlined,
               title: l10n.settingsTheme,
@@ -117,6 +121,21 @@ final class _SettingsBody extends StatelessWidget {
             ),
           ],
         ),
+        if (kDebugMode) ...[
+          const Sizer.xl(),
+          _Section(
+            title: 'Debug',
+            children: [
+              _SettingsRow(
+                icon: Icons.bug_report_outlined,
+                title: 'Envoyer une notification test',
+                onTap: () => context
+                    .read<ReminderCoordinator>()
+                    .showTodaysReminderNow(settings),
+              ),
+            ],
+          ),
+        ],
         const Sizer.xl(),
         Center(
           child: Text(
@@ -282,6 +301,86 @@ final class _SettingsRow extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Reflects the OS notification permission and offers a re-enable path for users
+/// who declined at onboarding. Tapping while disabled re-requests permission,
+/// then guides to the system settings if the OS won't prompt again.
+final class _NotificationsRow extends StatefulWidget {
+  const _NotificationsRow({required this.settings});
+
+  final AppSettings settings;
+
+  @override
+  State<_NotificationsRow> createState() => _NotificationsRowState();
+}
+
+final class _NotificationsRowState extends State<_NotificationsRow>
+    with WidgetsBindingObserver {
+  NotificationPermission _status = NotificationPermission.notDetermined;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refresh();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // The user may have flipped the switch in the system settings and returned.
+    if (state == AppLifecycleState.resumed) _refresh();
+  }
+
+  Future<void> _refresh() async {
+    final coordinator = context.read<ReminderCoordinator>();
+    final status = await coordinator.permissionStatus();
+    if (!mounted) return;
+    final becameGranted = status == NotificationPermission.granted &&
+        _status != NotificationPermission.granted;
+    if (becameGranted) await coordinator.reschedule(widget.settings);
+    if (!mounted) return;
+    setState(() => _status = status);
+  }
+
+  Future<void> _handleTap() async {
+    final coordinator = context.read<ReminderCoordinator>();
+    switch (_status) {
+      case NotificationPermission.notDetermined:
+        // First time: show the native OS permission dialog.
+        await coordinator.ensureEnabled(widget.settings);
+        if (!mounted) return;
+        await _refresh();
+      case NotificationPermission.denied:
+        // The OS won't prompt again; send the user to the system settings.
+        // The result is picked up on resume via didChangeAppLifecycleState.
+        await coordinator.openSystemSettings();
+      case NotificationPermission.granted:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final enabled = _status == NotificationPermission.granted;
+    return _SettingsRow(
+      icon: enabled
+          ? Icons.notifications_active_outlined
+          : Icons.notifications_off_outlined,
+      title: l10n.settingsNotifications,
+      value: enabled
+          ? l10n.settingsNotificationsEnabled
+          : l10n.settingsNotificationsDisabled,
+      onTap: enabled ? null : _handleTap,
     );
   }
 }

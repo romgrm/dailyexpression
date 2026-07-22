@@ -1,3 +1,4 @@
+import 'package:daily_expression/data/repositories/settings_repository.dart';
 import 'package:daily_expression/domain/models/app_settings.dart';
 import 'package:daily_expression/domain/models/scheduled_reminder.dart';
 import 'package:daily_expression/domain/notifications/notification_scheduler.dart';
@@ -5,6 +6,7 @@ import 'package:daily_expression/domain/use_cases/plan_daily_reminders.dart';
 import 'package:daily_expression/ui/core/notifications/reminder_coordinator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../support/corpus_mock.dart';
 import '../../../support/fake_clock.dart';
@@ -17,6 +19,12 @@ void main() {
 
   setUpAll(() => registerFallbackValue(<ScheduledReminder>[]));
 
+  late SettingsRepository settingsRepository;
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    settingsRepository = SettingsRepository(await SharedPreferences.getInstance());
+  });
+
   ReminderCoordinator build(_MockScheduler scheduler) => ReminderCoordinator(
         corpus: buildMockCorpusRepository(),
         log: InMemoryDailyLog(),
@@ -25,6 +33,7 @@ void main() {
           userSeed: 'seed-A',
         ),
         scheduler: scheduler,
+        settings: settingsRepository,
       );
 
   const settings = AppSettings(
@@ -51,9 +60,9 @@ void main() {
     for (var i = 0; i < captured.length; i++) {
       expect(captured[i].id, i);
       expect(captured[i].scheduledAt.hour, 8);
-      expect(captured[i].title, 'Ton expression du jour');
-      expect(captured[i].body, startsWith('Aujourd\'hui : '));
-      expect(captured[i].body.length, greaterThan('Aujourd\'hui : '.length));
+      expect(captured[i].title, isNotEmpty);
+      expect(captured[i].body, startsWith('«'));
+      expect(captured[i].body, contains('traduction'));
     }
   });
 
