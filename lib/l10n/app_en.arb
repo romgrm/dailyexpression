@@ -26,6 +26,10 @@
   "actionEnableReminders": "Enable reminders",
   "actionLater": "Later",
   "dailyToday": "Today",
+  "dailyStreakTooltip": "{count}-day streak",
+  "@dailyStreakTooltip": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "dailyLiteral": "“Literally: {image}”",
   "@dailyLiteral": {
     "placeholders": { "image": { "type": "String" } }

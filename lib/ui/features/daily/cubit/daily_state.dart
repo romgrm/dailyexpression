@@ -14,6 +14,7 @@ class DailyLoaded extends DailyState {
     required this.date,
     required this.expression,
     required this.nativeLanguageName,
+    required this.streakCount,
   });
 
   final DateTime date;
@@ -21,6 +22,9 @@ class DailyLoaded extends DailyState {
 
   /// The native language's own name (e.g. 'Français'), for the equivalent block.
   final String nativeLanguageName;
+
+  /// The consecutive-day open streak, incremented on this app open.
+  final int streakCount;
 }
 
 class DailyError extends DailyState {

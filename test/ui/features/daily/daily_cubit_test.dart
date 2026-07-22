@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/fake_clock.dart';
 import '../../../support/in_memory_daily_log.dart';
+import '../../../support/in_memory_streak_repo.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,7 @@ void main() {
   DailyCubit buildCubit({
     required String native,
     required String target,
+    InMemoryStreakRepository? streakRepository,
   }) {
     final clock = FakeClock(DateTime(2026, 7, 17));
     return DailyCubit(
@@ -23,6 +25,7 @@ void main() {
         clock: clock,
         userSeed: 'seed-A',
       ),
+      streakRepository: streakRepository ?? InMemoryStreakRepository(),
       clock: clock,
       uiLanguageCode: 'fr',
       nativeLanguageCode: native,
@@ -40,6 +43,20 @@ void main() {
     expect(loaded.expression.idiom, isNotEmpty);
     expect(loaded.expression.nativeEquivalentOrPlaceholder, isNotEmpty);
     expect(loaded.nativeLanguageName, 'Français');
+  });
+
+  test('registers the app open by starting the streak at 1', () async {
+    final streakRepository = InMemoryStreakRepository();
+    final cubit = buildCubit(
+      native: 'fr',
+      target: 'en',
+      streakRepository: streakRepository,
+    );
+    await cubit.stream.firstWhere((state) => state is! DailyLoading);
+
+    final loaded = cubit.state as DailyLoaded;
+    expect(loaded.streakCount, 1);
+    expect(streakRepository.state.count, 1);
   });
 
   test('emits DailyError for a pair with no concepts', () async {

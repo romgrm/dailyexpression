@@ -4,8 +4,11 @@ import 'package:daily_expression/core/logging/app_log.dart';
 import 'package:daily_expression/data/repositories/corpus_repository.dart';
 import 'package:daily_expression/domain/models/daily_expression.dart';
 import 'package:daily_expression/domain/models/language_pair.dart';
+import 'package:daily_expression/domain/models/streak_state.dart';
+import 'package:daily_expression/domain/repositories/streak_repository.dart';
 import 'package:daily_expression/domain/time/clock.dart';
 import 'package:daily_expression/domain/use_cases/get_daily_expression.dart';
+import 'package:daily_expression/domain/use_cases/streak_calculator.dart';
 import 'daily_state.dart';
 
 /// Loads today's expression for the user's pair (native -> target) and exposes
@@ -15,12 +18,14 @@ class DailyCubit extends Cubit<DailyState> {
   DailyCubit({
     required CorpusRepository corpus,
     required GetDailyExpression getDailyExpression,
+    required StreakRepository streakRepository,
     required Clock clock,
     required String uiLanguageCode,
     required String nativeLanguageCode,
     required String targetLanguageCode,
   })  : _corpus = corpus,
         _getDailyExpression = getDailyExpression,
+        _streakRepository = streakRepository,
         _clock = clock,
         _uiLanguageCode = uiLanguageCode,
         _nativeLanguageCode = nativeLanguageCode,
@@ -31,6 +36,7 @@ class DailyCubit extends Cubit<DailyState> {
 
   final CorpusRepository _corpus;
   final GetDailyExpression _getDailyExpression;
+  final StreakRepository _streakRepository;
   final Clock _clock;
   final String _uiLanguageCode;
   final String _nativeLanguageCode;
@@ -59,15 +65,26 @@ class DailyCubit extends Cubit<DailyState> {
       final nativeName =
           config.languageByCode(pair.native)?.displayName(_uiLanguageCode) ??
               pair.native;
+      final streak = await _registerOpen();
       logger.d('[daily] loaded ${concept.id} for ${pair.glossKey}');
       emit(DailyLoaded(
         date: _clock.now(),
         expression: expression,
         nativeLanguageName: nativeName,
+        streakCount: streak.count,
       ));
     } catch (error, stackTrace) {
       logger.e('[daily] load failed', error: error, stackTrace: stackTrace);
       emit(const DailyError());
     }
+  }
+
+  /// Advances the streak for this app open and persists it when it changed.
+  /// Idempotent within a day, so a retry or cubit rebuild never double-counts.
+  Future<StreakState> _registerOpen() async {
+    final previous = await _streakRepository.read();
+    final updated = nextStreak(previous, _clock.now());
+    if (updated != previous) await _streakRepository.save(updated);
+    return updated;
   }
 }

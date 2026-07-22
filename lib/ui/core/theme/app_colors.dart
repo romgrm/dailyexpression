@@ -42,4 +42,10 @@ abstract final class AppColors {
   static const goldBadgeText = Color(0xFF8A6D1B);
   static const goldBadgeBackgroundDark = Color(0xFF3A3320);
   static const goldBadgeTextDark = Color(0xFFE3C778);
+
+  // ---- Supplementary: streak flame (not in the Figma variable set) ----
+  static const flame = Color(0xFFE2572B);
+  static const flameBackground = Color(0xFFFCE9E1);
+  static const flameDark = Color(0xFFF07A52);
+  static const flameBackgroundDark = Color(0xFF3A241C);
 }

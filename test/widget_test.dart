@@ -1,5 +1,6 @@
 import 'package:daily_expression/data/repositories/corpus_repository.dart';
 import 'package:daily_expression/data/repositories/prefs_daily_log_repository.dart';
+import 'package:daily_expression/data/repositories/prefs_streak_repository.dart';
 import 'package:daily_expression/data/repositories/settings_repository.dart';
 import 'package:daily_expression/data/sources/corpus_local_data_source.dart';
 import 'package:daily_expression/domain/models/scheduled_reminder.dart';
@@ -61,6 +62,7 @@ void main() {
           scheduler: const _NoopScheduler(),
           settings: settingsRepository,
         ),
+        streakRepository: PrefsStreakRepository(prefs),
         clock: clock,
         initialSettings: settingsRepository.read(),
       ),
