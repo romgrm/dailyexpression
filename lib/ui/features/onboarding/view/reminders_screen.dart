@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:daily_expression/l10n/generated/app_localizations.dart';
+import 'package:daily_expression/ui/core/notifications/reminder_coordinator.dart';
 import 'package:daily_expression/ui/core/settings/settings_cubit.dart';
 import 'package:daily_expression/ui/core/theme/app_spacing.dart';
 import 'package:daily_expression/ui/core/widgets/widgets.dart';
@@ -32,12 +33,24 @@ final class RemindersScreen extends StatelessWidget {
           );
     }
 
+    // The reschedule itself is driven by the root settings listener once
+    // onboarding completes; here we only ask for permission when the user opts
+    // in, and complete either way.
+    Future<void> enableAndComplete() async {
+      await context.read<ReminderCoordinator>().requestPermission();
+      if (!context.mounted) return;
+      await complete();
+    }
+
     return AppScaffold(
       showBack: true,
       bottomAction: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PrimaryButton(label: l10n.actionEnableReminders, onPressed: complete),
+          PrimaryButton(
+            label: l10n.actionEnableReminders,
+            onPressed: enableAndComplete,
+          ),
           const Sizer.xs(),
           TextButton(onPressed: complete, child: Text(l10n.actionLater)),
         ],
