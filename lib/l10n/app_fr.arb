@@ -23,6 +23,10 @@
   "actionEnableReminders": "Activer les rappels",
   "actionLater": "Plus tard",
   "dailyToday": "Aujourd'hui",
+  "dailyStreakTooltip": "Série de {count} jours",
+  "@dailyStreakTooltip": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "dailyLiteral": "« Littéralement : {image} »",
   "dailyEquivalentIn": "Équivalent en {language}",
   "dailyInContext": "En contexte",

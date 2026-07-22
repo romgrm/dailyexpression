@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:daily_expression/data/repositories/corpus_repository.dart';
+import 'package:daily_expression/domain/repositories/streak_repository.dart';
 import 'package:daily_expression/domain/time/clock.dart';
 import 'package:daily_expression/domain/use_cases/get_daily_expression.dart';
 import 'package:daily_expression/l10n/generated/app_localizations.dart';
 import 'package:daily_expression/ui/core/settings/settings_cubit.dart';
+import 'package:daily_expression/ui/core/theme/app_colors.dart';
 import 'package:daily_expression/ui/core/theme/app_spacing.dart';
 import 'package:daily_expression/ui/core/widgets/widgets.dart';
 import '../cubit/daily_cubit.dart';
@@ -30,6 +32,7 @@ final class DailyView extends StatelessWidget {
       create: (context) => DailyCubit(
         corpus: context.read<CorpusRepository>(),
         getDailyExpression: context.read<GetDailyExpression>(),
+        streakRepository: context.read<StreakRepository>(),
         clock: context.read<Clock>(),
         uiLanguageCode: uiLanguageCode,
         nativeLanguageCode: nativeLanguageCode,
@@ -68,7 +71,7 @@ final class _DailyContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _TopBar(),
+          _TopBar(streakCount: state.streakCount),
           const Sizer.l(),
           Overline('${l10n.dailyToday} · $formattedDate'),
           const Sizer.m(),
@@ -83,7 +86,9 @@ final class _DailyContent extends StatelessWidget {
 }
 
 final class _TopBar extends StatelessWidget {
-  const _TopBar();
+  const _TopBar({required this.streakCount});
+
+  final int streakCount;
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +101,38 @@ final class _TopBar extends StatelessWidget {
         const Sizer.s(),
         Text(l10n.appTitle, style: theme.textTheme.titleLarge),
         const Spacer(),
+        _StreakChip(count: streakCount),
+        const Sizer.xs(),
         IconButton(
           onPressed: () => context.push('/settings'),
           icon: const Icon(Icons.settings_outlined),
           tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
         ),
       ],
+    );
+  }
+}
+
+/// The consecutive-day streak as a flame chip, using the supplementary flame
+/// tokens (like the gold CEFR badge, these live outside the Material scheme).
+final class _StreakChip extends StatelessWidget {
+  const _StreakChip({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
+    return Tooltip(
+      message: l10n.dailyStreakTooltip(count),
+      child: Pill(
+        icon: Icons.local_fire_department,
+        label: '$count',
+        backgroundColor:
+            isDark ? AppColors.flameBackgroundDark : AppColors.flameBackground,
+        foregroundColor: isDark ? AppColors.flameDark : AppColors.flame,
+      ),
     );
   }
 }
