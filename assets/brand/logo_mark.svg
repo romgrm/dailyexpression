@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="#1B6B6B">
+  <!-- Two raindrops that also read as an opening French guillemet («). -->
+  <path d="M34,30 C42,41 48,51 48,60 A14,14 0 0 1 20,60 C20,51 26,41 34,30 Z"/>
+  <path d="M66,30 C74,41 80,51 80,60 A14,14 0 0 1 52,60 C52,51 58,41 66,30 Z"/>
+</svg>

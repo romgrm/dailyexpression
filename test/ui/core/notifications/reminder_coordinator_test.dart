@@ -1,6 +1,7 @@
 import 'package:daily_expression/data/repositories/settings_repository.dart';
 import 'package:daily_expression/domain/models/app_settings.dart';
 import 'package:daily_expression/domain/models/scheduled_reminder.dart';
+import 'package:daily_expression/domain/notifications/notification_permission.dart';
 import 'package:daily_expression/domain/notifications/notification_scheduler.dart';
 import 'package:daily_expression/domain/use_cases/plan_daily_reminders.dart';
 import 'package:daily_expression/ui/core/notifications/reminder_coordinator.dart';
@@ -70,5 +71,41 @@ void main() {
     final scheduler = _MockScheduler();
     await build(scheduler).reschedule(const AppSettings());
     verifyNever(() => scheduler.schedule(any()));
+  });
+
+  group('permissionStatus', () {
+    test('granted when the OS reports notifications enabled', () async {
+      final scheduler = _MockScheduler();
+      when(() => scheduler.hasPermission()).thenAnswer((_) async => true);
+
+      expect(
+        await build(scheduler).permissionStatus(),
+        NotificationPermission.granted,
+      );
+    });
+
+    test('notDetermined when never requested and not enabled', () async {
+      final scheduler = _MockScheduler();
+      when(() => scheduler.hasPermission()).thenAnswer((_) async => false);
+
+      expect(
+        await build(scheduler).permissionStatus(),
+        NotificationPermission.notDetermined,
+      );
+    });
+
+    test('denied once permission was requested but stays disabled', () async {
+      final scheduler = _MockScheduler();
+      when(() => scheduler.hasPermission()).thenAnswer((_) async => false);
+      when(() => scheduler.requestPermission()).thenAnswer((_) async => false);
+      final coordinator = build(scheduler);
+
+      await coordinator.requestPermission(); // records the persisted flag
+
+      expect(
+        await coordinator.permissionStatus(),
+        NotificationPermission.denied,
+      );
+    });
   });
 }

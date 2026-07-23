@@ -11,6 +11,7 @@ import 'package:daily_expression/ui/features/settings/view/settings_screen.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../support/corpus_mock.dart';
@@ -37,6 +38,13 @@ class _NoopScheduler implements NotificationScheduler {
 void main() {
   testWidgets('renders preferences and switches theme to Dark', (tester) async {
     SharedPreferences.setMockInitialValues({'native_language': 'fr'});
+    PackageInfo.setMockInitialValues(
+      appName: 'Daily Expression',
+      packageName: 'com.grm.daily_expression',
+      version: '1.0.0',
+      buildNumber: '1',
+      buildSignature: '',
+    );
     final prefs = await SharedPreferences.getInstance();
     final settingsRepo = SettingsRepository(prefs);
     final cubit = SettingsCubit(settingsRepo, settingsRepo.read());

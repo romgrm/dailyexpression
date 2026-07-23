@@ -47,6 +47,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   app_settings: ^8.0.3
+  package_info_plus: ^10.2.1
+  in_app_review: ^2.0.12
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -67,10 +70,10 @@ dev_dependencies:
 #   dart run flutter_native_splash:create
 flutter_native_splash:
   color: "#FAF8F4"
-  color_dark: "#141210"
+  color_dark: "#1C1917"
   android_12:
     color: "#FAF8F4"
-    color_dark: "#141210"
+    color_dark: "#1C1917"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -89,6 +92,7 @@ flutter:
   assets:
     - assets/corpus/corpus.json
     - assets/corpus/corpus_v2.json
+    - assets/brand/logo_mark.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
