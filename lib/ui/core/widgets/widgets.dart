@@ -7,4 +7,5 @@ export 'overline.dart';
 export 'page_dots.dart';
 export 'pill.dart';
 export 'primary_button.dart';
+export 'pronounce_button.dart';
 export 'section_card.dart';

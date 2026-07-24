@@ -13,10 +13,12 @@ final class DailyCard extends StatelessWidget {
     super.key,
     required this.expression,
     required this.nativeLanguageName,
+    required this.targetLanguageCode,
   });
 
   final DailyExpression expression;
   final String nativeLanguageName;
+  final String targetLanguageCode;
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +64,20 @@ final class DailyCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '"${expression.idiom}"',
-                  style: theme.textTheme.displaySmall,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '"${expression.idiom}"',
+                        style: theme.textTheme.displaySmall,
+                      ),
+                    ),
+                    PronounceButton(
+                      text: expression.idiom,
+                      languageCode: targetLanguageCode,
+                    ),
+                  ],
                 ),
                 const Sizer.m(),
                 Text(

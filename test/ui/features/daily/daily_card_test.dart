@@ -59,6 +59,7 @@ void main() {
       wrap(DailyCard(
         expression: expressionWith(),
         nativeLanguageName: 'Français',
+        targetLanguageCode: 'en',
       )),
     );
 
@@ -75,6 +76,7 @@ void main() {
       wrap(DailyCard(
         expression: expressionWith(note: 'Aucun idiome équivalent direct.'),
         nativeLanguageName: 'Français',
+        targetLanguageCode: 'en',
       )),
     );
 

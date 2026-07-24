@@ -14,6 +14,7 @@ class DailyLoaded extends DailyState {
     required this.date,
     required this.expression,
     required this.nativeLanguageName,
+    required this.targetLanguageCode,
     required this.streakCount,
   });
 
@@ -22,6 +23,9 @@ class DailyLoaded extends DailyState {
 
   /// The native language's own name (e.g. 'Français'), for the equivalent block.
   final String nativeLanguageName;
+
+  /// The target language's two-letter code (e.g. 'en'), for pronunciation.
+  final String targetLanguageCode;
 
   /// The consecutive-day open streak, incremented on this app open.
   final int streakCount;

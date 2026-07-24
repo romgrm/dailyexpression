@@ -77,6 +77,7 @@ void main() {
             child: DailyCard(
               expression: daily.expression,
               nativeLanguageName: daily.nativeLanguageName,
+              targetLanguageCode: daily.targetLanguageCode,
             ),
           ),
         ),

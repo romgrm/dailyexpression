@@ -54,7 +54,9 @@ lib/l10n/generated/
 # Coverage reports
 coverage/
 *.lcov
-test/failures/
+
+# Golden-test failure diffs (regenerated on every failing run; never commit)
+**/failures/
 
 # Secrets & environment files (never commit credentials)
 *.env

@@ -27,6 +27,7 @@
   "@dailyStreakTooltip": {
     "placeholders": { "count": { "type": "int" } }
   },
+  "dailyPronounceTooltip": "Écouter la prononciation",
   "dailyLiteral": "« Littéralement : {image} »",
   "dailyEquivalentIn": "Équivalent en {language}",
   "dailyInContext": "En contexte",

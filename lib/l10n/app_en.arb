@@ -30,6 +30,7 @@
   "@dailyStreakTooltip": {
     "placeholders": { "count": { "type": "int" } }
   },
+  "dailyPronounceTooltip": "Listen to the pronunciation",
   "dailyLiteral": "“Literally: {image}”",
   "@dailyLiteral": {
     "placeholders": { "image": { "type": "String" } }

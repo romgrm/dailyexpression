@@ -78,6 +78,7 @@ final class _DailyContent extends StatelessWidget {
           DailyCard(
             expression: state.expression,
             nativeLanguageName: state.nativeLanguageName,
+            targetLanguageCode: state.targetLanguageCode,
           ),
         ],
       ),
