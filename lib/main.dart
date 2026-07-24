@@ -9,9 +9,11 @@ import 'data/repositories/prefs_daily_log_repository.dart';
 import 'data/repositories/prefs_streak_repository.dart';
 import 'data/repositories/settings_repository.dart';
 import 'data/sources/corpus_local_data_source.dart';
-import 'data/sources/notification_local_data_source.dart';
+import 'data/services/notification_service.dart';
+import 'data/services/tts_speech_service.dart';
 import 'domain/models/app_settings.dart';
 import 'domain/repositories/streak_repository.dart';
+import 'domain/speech/speech_synthesizer.dart';
 import 'domain/time/clock.dart';
 import 'domain/use_cases/get_daily_expression.dart';
 import 'domain/use_cases/plan_daily_reminders.dart';
@@ -42,7 +44,7 @@ Future<void> main() async {
     corpus: corpusRepository,
     log: dailyLog,
     planReminders: PlanDailyReminders(clock: clock, userSeed: userSeed),
-    scheduler: NotificationLocalDataSource(),
+    scheduler: NotificationService(),
     settings: settingsRepository,
   );
 
@@ -94,6 +96,9 @@ class DailyExpressionApp extends StatelessWidget {
         RepositoryProvider.value(value: reminderCoordinator),
         RepositoryProvider<StreakRepository>.value(value: streakRepository),
         RepositoryProvider<Clock>.value(value: clock),
+        RepositoryProvider<SpeechSynthesizer>(
+          create: (_) => TtsSpeechService(),
+        ),
       ],
       child: BlocProvider(
         create: (_) => SettingsCubit(settingsRepository, initialSettings),

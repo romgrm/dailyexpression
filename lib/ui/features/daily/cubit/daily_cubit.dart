@@ -71,6 +71,7 @@ class DailyCubit extends Cubit<DailyState> {
         date: _clock.now(),
         expression: expression,
         nativeLanguageName: nativeName,
+        targetLanguageCode: pair.target,
         streakCount: streak.count,
       ));
     } catch (error, stackTrace) {

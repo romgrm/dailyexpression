@@ -126,7 +126,11 @@ CorpusRepository buildMockCorpusRepository() =>
 
 /// The projection of a mock concept plus the native language name, mirroring
 /// exactly what `DailyCubit` feeds into `DailyCard`.
-typedef MockDaily = ({DailyExpression expression, String nativeLanguageName});
+typedef MockDaily = ({
+  DailyExpression expression,
+  String nativeLanguageName,
+  String targetLanguageCode,
+});
 
 /// Projects [conceptId] from the mock corpus for [pair] and [uiLanguageCode],
 /// following the same pipeline as `DailyCubit` (parse -> config -> projection)
@@ -155,5 +159,9 @@ Future<MockDaily> loadMockDaily({
   final nativeName =
       config.languageByCode(pair.native)?.displayName(uiLanguageCode) ??
           pair.native;
-  return (expression: expression, nativeLanguageName: nativeName);
+  return (
+    expression: expression,
+    nativeLanguageName: nativeName,
+    targetLanguageCode: pair.target,
+  );
 }

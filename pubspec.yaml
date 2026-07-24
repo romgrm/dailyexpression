@@ -50,6 +50,7 @@ dependencies:
   package_info_plus: ^10.2.1
   in_app_review: ^2.0.12
   flutter_svg: ^2.3.0
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:

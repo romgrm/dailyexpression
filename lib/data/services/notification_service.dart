@@ -12,8 +12,8 @@ import '../../domain/notifications/notification_scheduler.dart';
 /// [NotificationScheduler] backed by flutter_local_notifications and the
 /// timezone database. Purely local: the OS holds the scheduled window and fires
 /// each entry at its local time even when the app is closed.
-class NotificationLocalDataSource implements NotificationScheduler {
-  NotificationLocalDataSource([FlutterLocalNotificationsPlugin? plugin])
+class NotificationService implements NotificationScheduler {
+  NotificationService([FlutterLocalNotificationsPlugin? plugin])
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   final FlutterLocalNotificationsPlugin _plugin;
