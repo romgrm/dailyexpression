@@ -24,9 +24,9 @@ abstract final class AppColors {
   static const lightOnError = Color(0xFFFFFFFF);
 
   // ---- Dark ----
-  static const darkBackground = Color(0xFF141210);
+  static const darkBackground = Color(0xFF1C1917); // "Encre chaude"
   static const darkForeground = Color(0xFFF5F0EB);
-  static const darkCard = Color(0xFF1E1C19);
+  static const darkCard = Color(0xFF26221F);
   static const darkPrimary = Color(0xFF4DB6AC);
   static const darkOnPrimary = Color(0xFF0E2626);
   static const darkAccent = Color(0xFF1A2E2E);
@@ -48,4 +48,12 @@ abstract final class AppColors {
   static const flameBackground = Color(0xFFFCE9E1);
   static const flameDark = Color(0xFFF07A52);
   static const flameBackgroundDark = Color(0xFF3A241C);
+
+  // ---- Brand: the two-raindrop mark ----
+  static const brandTeal = Color(0xFF1B6B6B); // "Teal profond"
+  static const brandTealMid = Color(0xFF2A8080); // "Teal mi-ton"
+  static const brandCream = Color(0xFFFAF8F4); // "Crème"
+  static const brandCreamSoft = Color(0xFFEAE3D6); // warmer cream for the drops
+  static const brandInk = Color(0xFF1C1917); // "Encre" — dark-mode logo bg
+  static const brandMist = Color(0xFFC5BFB8); // "Brume"
 }

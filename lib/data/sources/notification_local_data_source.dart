@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import 'package:app_settings/app_settings.dart' as app_settings;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -31,7 +33,7 @@ class NotificationLocalDataSource implements NotificationScheduler {
     tz.setLocalLocation(tz.getLocation(localZone.identifier));
 
     const settings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: AndroidInitializationSettings('@drawable/ic_stat_notification'),
       iOS: DarwinInitializationSettings(
         requestAlertPermission: false,
         requestBadgePermission: false,
@@ -133,6 +135,7 @@ class NotificationLocalDataSource implements NotificationScheduler {
           channelDescription: _channelDescription,
           importance: Importance.high,
           priority: Priority.high,
+          color: Color(0xFF1B6B6B), // brand teal accent
         ),
         iOS: DarwinNotificationDetails(),
       );

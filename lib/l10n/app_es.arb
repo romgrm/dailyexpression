@@ -42,7 +42,6 @@
   "settingsNotifications": "Notificaciones",
   "settingsNotificationsEnabled": "Activadas",
   "settingsNotificationsDisabled": "Desactivadas",
-  "settingsNotificationsBlocked": "Permite las notificaciones en los ajustes de tu teléfono para recibir tu recordatorio diario.",
   "settingsTheme": "Tema",
   "settingsThemeSystem": "Automático",
   "settingsThemeLight": "Claro",

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:daily_expression/data/repositories/corpus_repository.dart';
 import 'package:daily_expression/domain/models/app_settings.dart';
@@ -13,9 +15,6 @@ import 'package:daily_expression/ui/core/settings/settings_cubit.dart';
 import 'package:daily_expression/ui/core/theme/app_spacing.dart';
 import 'package:daily_expression/ui/core/widgets/widgets.dart';
 
-/// App version shown in the About section. Kept in sync with pubspec.
-const String _appVersion = '1.0.0';
-
 /// Preferences screen: source language, daily reminder time, theme switcher,
 /// plus an About section. All changes persist through [SettingsCubit].
 final class SettingsScreen extends StatelessWidget {
@@ -26,27 +25,48 @@ final class SettingsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
-      body: FutureBuilder<CorpusConfig>(
-        future: context.read<CorpusRepository>().loadConfig(),
+      body: FutureBuilder<_SettingsData>(
+        future: _load(context),
         builder: (context, snapshot) {
-          final config = snapshot.data;
-          if (config == null) {
+          final data = snapshot.data;
+          if (data == null) {
             return const Center(child: CircularProgressIndicator());
           }
           return BlocBuilder<SettingsCubit, AppSettings>(
-            builder: (context, settings) =>
-                _SettingsBody(config: config, settings: settings),
+            builder: (context, settings) => _SettingsBody(
+              config: data.config,
+              version: data.version,
+              settings: settings,
+            ),
           );
         },
       ),
     );
   }
+
+  Future<_SettingsData> _load(BuildContext context) async {
+    final config = await context.read<CorpusRepository>().loadConfig();
+    final info = await PackageInfo.fromPlatform();
+    return _SettingsData(config: config, version: info.version);
+  }
+}
+
+class _SettingsData {
+  const _SettingsData({required this.config, required this.version});
+
+  final CorpusConfig config;
+  final String version;
 }
 
 final class _SettingsBody extends StatelessWidget {
-  const _SettingsBody({required this.config, required this.settings});
+  const _SettingsBody({
+    required this.config,
+    required this.version,
+    required this.settings,
+  });
 
   final CorpusConfig config;
+  final String version;
   final AppSettings settings;
 
   @override
@@ -109,15 +129,13 @@ final class _SettingsBody extends StatelessWidget {
               onTap: () => showAboutDialog(
                 context: context,
                 applicationName: l10n.appTitle,
-                applicationVersion: l10n.settingsVersion(_appVersion),
+                applicationVersion: l10n.settingsVersion(version),
               ),
             ),
             _SettingsRow(
               icon: Icons.star_outline,
               title: l10n.settingsLeaveReview,
-              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.settingsComingSoon)),
-              ),
+              onTap: _requestReview,
             ),
           ],
         ),
@@ -139,7 +157,7 @@ final class _SettingsBody extends StatelessWidget {
         const Sizer.xl(),
         Center(
           child: Text(
-            '${l10n.appTitle} · ${l10n.settingsVersion(_appVersion)}',
+            '${l10n.appTitle} · ${l10n.settingsVersion(version)}',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -147,6 +165,15 @@ final class _SettingsBody extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Opens the OS's native in-app review prompt when the platform allows it
+  /// (no-op in development or when the quota is exhausted).
+  Future<void> _requestReview() async {
+    final inAppReview = InAppReview.instance;
+    if (await inAppReview.isAvailable()) {
+      await inAppReview.requestReview();
+    }
   }
 
   String _themeLabel(AppLocalizations l10n, AppThemeMode mode) => switch (mode) {
@@ -340,13 +367,15 @@ final class _NotificationsRowState extends State<_NotificationsRow>
     if (state == AppLifecycleState.resumed) _refresh();
   }
 
-  Future<void> _refresh() async {
+  Future<void> _refresh({bool rescheduleWhenGranted = true}) async {
     final coordinator = context.read<ReminderCoordinator>();
     final status = await coordinator.permissionStatus();
     if (!mounted) return;
     final becameGranted = status == NotificationPermission.granted &&
         _status != NotificationPermission.granted;
-    if (becameGranted) await coordinator.reschedule(widget.settings);
+    if (rescheduleWhenGranted && becameGranted) {
+      await coordinator.reschedule(widget.settings);
+    }
     if (!mounted) return;
     setState(() => _status = status);
   }
@@ -355,10 +384,11 @@ final class _NotificationsRowState extends State<_NotificationsRow>
     final coordinator = context.read<ReminderCoordinator>();
     switch (_status) {
       case NotificationPermission.notDetermined:
-        // First time: show the native OS permission dialog.
+        // ensureEnabled already reschedules when granted; only refresh the
+        // label here so we don't schedule the window twice.
         await coordinator.ensureEnabled(widget.settings);
         if (!mounted) return;
-        await _refresh();
+        await _refresh(rescheduleWhenGranted: false);
       case NotificationPermission.denied:
         // The OS won't prompt again; send the user to the system settings.
         // The result is picked up on resume via didChangeAppLifecycleState.

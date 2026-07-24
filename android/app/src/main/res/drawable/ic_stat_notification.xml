@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- The two-raindrop mark, white on transparent. Android tints notification
+         small icons monochrome, so only the silhouette matters. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M34,30 C42,41 48,51 48,60 A14,14 0 0 1 20,60 C20,51 26,41 34,30 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M66,30 C74,41 80,51 80,60 A14,14 0 0 1 52,60 C52,51 58,41 66,30 Z" />
+</vector>

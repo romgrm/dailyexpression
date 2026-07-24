@@ -47,6 +47,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   app_settings: ^8.0.3
+  package_info_plus: ^10.2.1
+  in_app_review: ^2.0.12
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -61,16 +64,26 @@ dev_dependencies:
   bloc_test: ^10.0.0
   mocktail: ^1.0.5
   flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
 
 # Native launch screen (shown by the OS before Flutter starts). Regenerate the
 # platform files after changing these values with:
 #   dart run flutter_native_splash:create
 flutter_native_splash:
   color: "#FAF8F4"
-  color_dark: "#141210"
+  color_dark: "#1C1917"
   android_12:
     color: "#FAF8F4"
-    color_dark: "#141210"
+    color_dark: "#1C1917"
+
+# App launcher icons, generated from the brand SVG (see tool/generate_app_icon.dart)
+# with: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "assets/brand/app_icon.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -89,6 +102,7 @@ flutter:
   assets:
     - assets/corpus/corpus.json
     - assets/corpus/corpus_v2.json
+    - assets/brand/logo_mark.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

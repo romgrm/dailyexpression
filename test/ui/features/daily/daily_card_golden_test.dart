@@ -16,8 +16,8 @@ import '../../../support/golden_fonts.dart';
 /// Regenerate with: flutter test --update-goldens test/ui/features/daily/daily_card_golden_test.dart
 ///
 /// The card renders with the real [AppTheme] color scheme and the vendored
-/// brand fonts (loaded by [loadGoldenFonts]): Fraunces for display/titles and
-/// Roboto for body/labels, mirroring [AppTypography]. The app fetches Fraunces
+/// brand fonts (loaded by [loadGoldenFonts]): Lora for display/titles and
+/// DM Sans for body/labels, mirroring [AppTypography]. The app fetches these
 /// via google_fonts at runtime, which is unavailable in the offline test zone,
 /// so the golden theme composes the same serif/sans split from the bundled TTFs
 /// — keeping colours, spacing, pills, badges, layout AND text faithful.

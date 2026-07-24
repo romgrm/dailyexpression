@@ -54,7 +54,6 @@
   "settingsNotifications": "Notifications",
   "settingsNotificationsEnabled": "Enabled",
   "settingsNotificationsDisabled": "Disabled",
-  "settingsNotificationsBlocked": "Allow notifications in your phone settings to receive your daily reminder.",
   "settingsTheme": "Theme",
   "settingsThemeSystem": "Automatic",
   "settingsThemeLight": "Light",
